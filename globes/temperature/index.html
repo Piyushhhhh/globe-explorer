@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://unpkg.com data:; connect-src 'self' https://raw.githubusercontent.com; font-src 'self';">
+    <title>Temperature Globe - Global Climate Change Explorer</title>
+    <link rel="stylesheet" href="temperature-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🌡️ Temperature Globe</h1>
+            <p class="subtitle">Explore global temperature changes and climate patterns</p>
+            <!-- Debug Button -->
+            <button id="debugTimeline" style="position: fixed; top: 80px; right: 20px; z-index: 9999; padding: 10px 20px; background: #fb923c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                🔧 Show Timeline (Debug)
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="zoom-hint" id="zoomHint">
+                    🔍 Click any country to see temperature data
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div class="info-header">
+                    <div class="country-flag">🌡️</div>
+                    <h2 class="country-name">Welcome to Temperature Globe</h2>
+                    <div class="country-rank">Interactive Climate Explorer</div>
+                </div>
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                        <p style="margin-bottom: 16px;">Click on any country to explore detailed temperature data, climate changes, and seasonal patterns.</p>
+                        <p style="font-size: 14px; opacity: 0.7; margin-bottom: 16px;">Countries are color-coded by warming levels:</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left; max-width: 280px; margin: 0 auto;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 16px; height: 16px; background: rgba(231, 76, 60, 0.5); border-radius: 3px;"></div>
+                                <span style="font-size: 13px;">High warming (≥2.0°C)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 16px; height: 16px; background: rgba(243, 156, 18, 0.5); border-radius: 3px;"></div>
+                                <span style="font-size: 13px;">Moderate warming (1.5-2.0°C)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 16px; height: 16px; background: rgba(46, 204, 113, 0.5); border-radius: 3px;"></div>
+                                <span style="font-size: 13px;">Lower warming (<1.5°C)</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; opacity: 0.6; margin-top: 16px;">Temperature anomalies relative to 1951-1980 baseline</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value" id="globalAnomaly">+1.35°C</span>
+                    <span class="stat-label">Global Average Change</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🔥</div>
+                    <span class="stat-value" id="highestWarming">Russia</span>
+                    <span class="stat-label">Highest Warming</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Temperature Data...</p>
+    </div>
+
+    <!-- Scripts (order matters: core modules → data → globe implementation) -->
+    <script src="../../core/config.js"></script>
+    <script src="../../core/ui-helpers.js"></script>
+    <script src="../../core/animation-engine.js"></script>
+    <script src="../../core/state-machine.js"></script>
+    <script src="../../core/gesture-handler.js"></script>
+    <script src="../../core/data-loader.js"></script>
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="temperature-data.js"></script>
+    <script src="temperature-timeline-data.js"></script>
+    <script src="../../core/data-validator.js"></script>
+    <script src="temperature-globe.js"></script>
+    <script src="temperature-timeline.js"></script>
+
+    <!-- Timeline Styles -->
+    <link rel="stylesheet" href="temperature-timeline.css">
+
+    <script>
+        // Initialize timeline after globe is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Attempting to initialize timeline...');
+                console.log('Globe exists:', typeof globe !== 'undefined' && globe);
+                console.log('initializeTemperatureTimeline exists:', typeof initializeTemperatureTimeline);
+
+                if (typeof initializeTemperatureTimeline === 'function') {
+                    console.log('Calling initializeTemperatureTimeline()');
+                    initializeTemperatureTimeline();
+                    console.log('Timeline initialized');
+                } else {
+                    console.error('initializeTemperatureTimeline function not found!');
+                }
+            }, 2000);
+        });
+
+        // Debug button handler
+        window.addEventListener('load', () => {
+            const btn = document.getElementById('debugTimeline');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    console.log('=== DEBUG BUTTON CLICKED ===');
+                    console.log('1. Globe exists:', typeof globe !== 'undefined');
+                    console.log('2. Globe value:', globe);
+                    console.log('3. initializeTemperatureTimeline:', typeof initializeTemperatureTimeline);
+                    console.log('4. TemperatureTimeline class:', typeof TemperatureTimeline);
+                    console.log('5. getGlobalAverage:', typeof getGlobalAverage);
+
+                    if (typeof initializeTemperatureTimeline === 'function') {
+                        alert('Attempting to initialize timeline...');
+                        try {
+                            initializeTemperatureTimeline();
+                            alert('Timeline initialized! Check bottom of page.');
+                        } catch(e) {
+                            alert('Error: ' + e.message);
+                            console.error(e);
+                        }
+                    } else {
+                        alert('ERROR: Timeline scripts not loaded!');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

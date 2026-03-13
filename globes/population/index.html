@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population Globe - Global Demographics Explorer</title>
+    <link rel="stylesheet" href="../../shared/styles/common.css">
+    <link rel="stylesheet" href="population-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>👥 Population Globe</h1>
+            <p class="subtitle">Explore global demographics and population trends</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="legend">
+                    <h4>Population Density</h4>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #10b981;"></span>
+                        <span>Low (&lt;50/km²)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #3b82f6;"></span>
+                        <span>Medium (50-100/km²)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #fb923c;"></span>
+                        <span>High (100-200/km²)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ef4444;"></span>
+                        <span>Very High (200-400/km²)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #dc2626;"></span>
+                        <span>Extreme (&gt;400/km²)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div class="info-header">
+                    <div class="country-flag">👥</div>
+                    <h2 class="country-name">Welcome to Population Globe</h2>
+                    <div class="country-rank">Interactive Demographics Explorer</div>
+                </div>
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                        <p style="margin-bottom: 16px;">Click on any country to explore detailed population data, demographics, and trends.</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Countries are color-coded by population density</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value">8.2B</span>
+                    <span class="stat-label">Global Population</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📈</div>
+                    <span class="stat-value">+0.87%</span>
+                    <span class="stat-label">Annual Growth</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏆</div>
+                    <span class="stat-value">India</span>
+                    <span class="stat-label">Most Populous</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Population Data...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../core/globe-base.js"></script>
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="population-data.js"></script>
+    <script src="population-timeline-data.js"></script>
+    <script src="population-globe.js"></script>
+    <script src="population-timeline.js"></script>
+
+    <!-- Timeline Styles -->
+    <link rel="stylesheet" href="population-timeline.css">
+
+    <script>
+        // Initialize timeline after globe is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (typeof initializeTimeline === 'function') {
+                    initializeTimeline();
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

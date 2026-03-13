@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biodiversity Globe - Global Wildlife Explorer</title>
+    <link rel="stylesheet" href="biodiversity-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🦁 Biodiversity Globe</h1>
+            <p class="subtitle">Explore wildlife and forests across the world</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div class="info-header">
+                    <div class="country-flag">🌿</div>
+                    <h2 class="country-name">Welcome to Biodiversity Globe</h2>
+                    <div class="country-rank">Interactive Wildlife Explorer</div>
+                </div>
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                        <p style="margin-bottom: 16px;">Click on any country to explore biodiversity data, iconic animals, and forest coverage.</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Countries are color-coded by forest coverage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value">178</span>
+                    <span class="stat-label">Countries Covered</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌳</div>
+                    <span class="stat-value">31%</span>
+                    <span class="stat-label">Global Forests</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🦁</div>
+                    <span class="stat-value">8.7M</span>
+                    <span class="stat-label">Total Species</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Biodiversity Data...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="biodiversity-data.js"></script>
+    <script src="biodiversity-globe.js"></script>
+    <script src="biodiversity-enhanced.js"></script>
+
+    <!-- Enhanced Styles -->
+    <link rel="stylesheet" href="biodiversity-enhanced.css">
+
+    <script>
+        // Initialize enhanced features after page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (typeof initializeEnhancedFeatures === 'function') {
+                    initializeEnhancedFeatures();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timeline Debug - Check Console</title>
+    <style>
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .step { margin: 10px 0; padding: 5px; }
+        .ok { color: #0f0; }
+        .fail { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Timeline Diagnostic</h1>
+    <div id="log"></div>
+
+    <script>
+        function log(msg, ok = true) {
+            const div = document.createElement('div');
+            div.className = ok ? 'step ok' : 'step fail';
+            div.textContent = (ok ? '✓ ' : '✗ ') + msg;
+            document.getElementById('log').appendChild(div);
+            console.log(msg);
+        }
+
+        log('Step 1: Testing file access...');
+
+        // Test each file
+        Promise.all([
+            fetch('temperature-timeline-data.js').then(r => ({name: 'data', ok: r.ok, status: r.status})),
+            fetch('temperature-timeline.js').then(r => ({name: 'js', ok: r.ok, status: r.status})),
+            fetch('temperature-timeline.css').then(r => ({name: 'css', ok: r.ok, status: r.status}))
+        ]).then(results => {
+            results.forEach(r => {
+                log(`${r.name}: HTTP ${r.status}`, r.ok);
+            });
+
+            if (results.every(r => r.ok)) {
+                log('Step 2: All files accessible, loading scripts...');
+                loadScripts();
+            } else {
+                log('Step 2: FAILED - Some files not found', false);
+            }
+        });
+
+        function loadScripts() {
+            // Load data first
+            const s1 = document.createElement('script');
+            s1.src = 'temperature-timeline-data.js';
+            s1.onload = () => {
+                log('Data script loaded');
+
+                // Check functions
+                if (typeof getGlobalAverage === 'function') {
+                    const temp = getGlobalAverage(2023);
+                    log(`getGlobalAverage(2023) = ${temp}°C`);
+                } else {
+                    log('getGlobalAverage NOT found', false);
+                }
+
+                // Load timeline JS
+                const s2 = document.createElement('script');
+                s2.src = 'temperature-timeline.js';
+                s2.onload = () => {
+                    log('Timeline script loaded');
+
+                    if (typeof TemperatureTimeline === 'function') {
+                        log('TemperatureTimeline class found');
+                    } else {
+                        log('TemperatureTimeline class NOT found', false);
+                    }
+
+                    if (typeof initializeTemperatureTimeline === 'function') {
+                        log('initializeTemperatureTimeline function found');
+                        log('Step 3: Attempting to call initializeTemperatureTimeline...');
+
+                        // Try to initialize (will fail because no globe, but we'll see the error)
+                        try {
+                            initializeTemperatureTimeline();
+                            log('initializeTemperatureTimeline called', false);
+                        } catch(e) {
+                            log(`Error: ${e.message}`, false);
+                        }
+                    } else {
+                        log('initializeTemperatureTimeline NOT found', false);
+                    }
+                };
+                s2.onerror = () => log('Failed to load timeline.js', false);
+                document.head.appendChild(s2);
+            };
+            s1.onerror = () => log('Failed to load data.js', false);
+            document.head.appendChild(s1);
+        }
+    </script>
+</body>
+</html>

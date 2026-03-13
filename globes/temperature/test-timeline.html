@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Test</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .log {
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #fb923c;
+        }
+        .error { border-color: #ef4444; color: #ef4444; }
+        .success { border-color: #10b981; color: #10b981; }
+    </style>
+</head>
+<body>
+    <h1>🌡️ Timeline Debug Test</h1>
+    <div id="output"></div>
+
+    <script>
+        const log = (msg, type = 'log') => {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('output').appendChild(div);
+            console.log(msg);
+        };
+
+        log('Starting tests...', 'log');
+
+        // Test 1: Check if files exist
+        fetch('temperature-timeline.js')
+            .then(r => {
+                if (r.ok) {
+                    log('✓ temperature-timeline.js exists', 'success');
+                    return r.text();
+                } else {
+                    throw new Error(`HTTP ${r.status}`);
+                }
+            })
+            .then(text => {
+                log(`✓ Timeline JS size: ${(text.length / 1024).toFixed(1)}KB`, 'success');
+            })
+            .catch(e => log(`✗ Error loading timeline.js: ${e.message}`, 'error'));
+
+        fetch('temperature-timeline-data.js')
+            .then(r => r.ok ? r.text() : Promise.reject(`HTTP ${r.status}`))
+            .then(text => {
+                log(`✓ Timeline data size: ${(text.length / 1024).toFixed(1)}KB`, 'success');
+            })
+            .catch(e => log(`✗ Error loading timeline-data.js: ${e}`, 'error'));
+
+        fetch('temperature-timeline.css')
+            .then(r => r.ok ? r.text() : Promise.reject(`HTTP ${r.status}`))
+            .then(text => {
+                log(`✓ Timeline CSS size: ${(text.length / 1024).toFixed(1)}KB`, 'success');
+            })
+            .catch(e => log(`✗ Error loading timeline.css: ${e}`, 'error'));
+
+        // Test 2: Load scripts
+        setTimeout(() => {
+            log('Loading timeline scripts...', 'log');
+
+            const script1 = document.createElement('script');
+            script1.src = 'temperature-timeline-data.js';
+            script1.onload = () => {
+                log('✓ Timeline data loaded', 'success');
+
+                // Check if functions exist
+                if (typeof getGlobalAverage === 'function') {
+                    log('✓ getGlobalAverage function exists', 'success');
+                    const temp1880 = getGlobalAverage(1880);
+                    const temp2023 = getGlobalAverage(2023);
+                    log(`  1880: ${temp1880}°C, 2023: ${temp2023}°C`, 'success');
+                } else {
+                    log('✗ getGlobalAverage function not found', 'error');
+                }
+
+                if (typeof getClimateEvent === 'function') {
+                    log('✓ getClimateEvent function exists', 'success');
+                    log(`  2023: ${getClimateEvent(2023)}`, 'log');
+                } else {
+                    log('✗ getClimateEvent function not found', 'error');
+                }
+            };
+            script1.onerror = () => log('✗ Failed to load timeline data', 'error');
+            document.head.appendChild(script1);
+
+            const script2 = document.createElement('script');
+            script2.src = 'temperature-timeline.js';
+            script2.onload = () => {
+                log('✓ Timeline JS loaded', 'success');
+
+                if (typeof TemperatureTimeline === 'function') {
+                    log('✓ TemperatureTimeline class exists', 'success');
+                } else {
+                    log('✗ TemperatureTimeline class not found', 'error');
+                }
+
+                if (typeof initializeTemperatureTimeline === 'function') {
+                    log('✓ initializeTemperatureTimeline function exists', 'success');
+                } else {
+                    log('✗ initializeTemperatureTimeline function not found', 'error');
+                }
+            };
+            script2.onerror = () => log('✗ Failed to load timeline JS', 'error');
+            document.head.appendChild(script2);
+
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'temperature-timeline.css';
+            link.onload = () => log('✓ Timeline CSS loaded', 'success');
+            link.onerror = () => log('✗ Failed to load timeline CSS', 'error');
+            document.head.appendChild(link);
+
+        }, 1000);
+    </script>
+</body>
+</html>

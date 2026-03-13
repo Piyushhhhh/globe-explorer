@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globe Explorer - Interactive 3D Data Visualizations</title>
+    <style>
+        /* ========================================
+           DESIGN SYSTEM - CSS Custom Properties
+           ======================================== */
+        :root {
+            /* Color Tokens */
+            --color-primary-100: #dbeafe;
+            --color-primary-300: #93c5fd;
+            --color-primary-500: #3b82f6;
+            --color-primary-600: #2563eb;
+            --color-primary-700: #1d4ed8;
+            --color-primary-900: #1e3a8a;
+
+            --color-success-100: #d1fae5;
+            --color-success-500: #10b981;
+            --color-success-700: #047857;
+
+            --color-warning-100: #fef3c7;
+            --color-warning-500: #f59e0b;
+            --color-warning-700: #b45309;
+
+            --color-neutral-50: #f8fafc;
+            --color-neutral-100: #f1f5f9;
+            --color-neutral-700: #334155;
+            --color-neutral-800: #1e293b;
+            --color-neutral-900: #0f172a;
+
+            /* Typography Tokens */
+            --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;      /* 12px */
+            --font-size-sm: 0.875rem;     /* 14px */
+            --font-size-base: 1rem;       /* 16px */
+            --font-size-lg: 1.125rem;     /* 18px */
+            --font-size-xl: 1.25rem;      /* 20px */
+            --font-size-2xl: 1.5rem;      /* 24px */
+            --font-size-3xl: 1.875rem;    /* 30px */
+            --font-size-4xl: 2.25rem;     /* 36px */
+            --font-size-5xl: 3rem;        /* 48px */
+            --font-size-6xl: 3.75rem;     /* 60px */
+
+            /* Spacing Tokens */
+            --space-1: 0.25rem;    /* 4px */
+            --space-2: 0.5rem;     /* 8px */
+            --space-3: 0.75rem;    /* 12px */
+            --space-4: 1rem;       /* 16px */
+            --space-5: 1.25rem;    /* 20px */
+            --space-6: 1.5rem;     /* 24px */
+            --space-8: 2rem;       /* 32px */
+            --space-10: 2.5rem;    /* 40px */
+            --space-12: 3rem;      /* 48px */
+            --space-16: 4rem;      /* 64px */
+            --space-20: 5rem;      /* 80px */
+
+            /* Shadow Tokens */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --shadow-glow: 0 0 20px rgb(59 130 246 / 0.3);
+            --shadow-glow-success: 0 0 20px rgb(16 185 129 / 0.4);
+
+            /* Transition Tokens */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+            /* Border Radius Tokens */
+            --radius-sm: 0.375rem;   /* 6px */
+            --radius-md: 0.5rem;     /* 8px */
+            --radius-lg: 0.75rem;    /* 12px */
+            --radius-xl: 1rem;       /* 16px */
+            --radius-2xl: 1.5rem;    /* 24px */
+            --radius-full: 9999px;
+        }
+
+        /* ========================================
+           BASE STYLES
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background: var(--color-neutral-900);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8) var(--space-5);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            animation: backgroundShift 20s ease infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        /* Floating particles effect */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Container for content */
+        .page-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        /* ========================================
+           HEADER SECTION
+           ======================================== */
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-16);
+            animation: fadeInDown 0.8s var(--transition-base);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--color-primary-300);
+            margin-bottom: var(--space-6);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .header-badge-icon {
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary-500);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--color-primary-500); }
+            50% { opacity: 0.4; box-shadow: none; }
+        }
+
+        .header h1 {
+            font-size: clamp(var(--font-size-4xl), 5vw, var(--font-size-6xl));
+            font-weight: 800;
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            letter-spacing: -0.02em;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            font-size: var(--font-size-lg);
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           GLOBE GRID
+           ======================================== */
+        .globe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: var(--space-8);
+            width: 100%;
+            margin-bottom: var(--space-16);
+        }
+
+        /* Staggered animation for cards */
+        .globe-card {
+            animation: fadeInUp 0.6s var(--transition-base) backwards;
+        }
+
+        .globe-card:nth-child(1) { animation-delay: 0.1s; }
+        .globe-card:nth-child(2) { animation-delay: 0.2s; }
+        .globe-card:nth-child(3) { animation-delay: 0.3s; }
+        .globe-card:nth-child(4) { animation-delay: 0.4s; }
+        .globe-card:nth-child(5) { animation-delay: 0.5s; }
+        .globe-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========================================
+           GLOBE CARD STYLES
+           ======================================== */
+        .globe-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Gradient border effect on hover */
+        .globe-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-2xl);
+            padding: 1px;
+            background: linear-gradient(135deg,
+                rgba(59, 130, 246, 0.4),
+                rgba(16, 185, 129, 0.2),
+                rgba(245, 158, 11, 0.2));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .globe-card:hover::before {
+            opacity: 1;
+        }
+
+        .globe-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(96, 165, 250, 0.3);
+            box-shadow:
+                var(--shadow-2xl),
+                var(--shadow-glow);
+        }
+
+        .globe-card:active {
+            transform: translateY(-8px) scale(1.01);
+        }
+
+        /* Live card special styling */
+        .globe-card:not(.disabled):hover {
+            box-shadow:
+                var(--shadow-2xl),
+                var(--shadow-glow-success);
+        }
+
+        /* Icon container */
+        .globe-icon-container {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-6);
+            transition: all var(--transition-bounce);
+        }
+
+        .globe-card:hover .globe-icon-container {
+            transform: scale(1.1) rotate(5deg);
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .globe-icon {
+            font-size: 48px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            transition: transform var(--transition-bounce);
+        }
+
+        .globe-card:hover .globe-icon {
+            transform: scale(1.1);
+        }
+
+        /* Card content */
+        .globe-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .globe-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin-bottom: var(--space-3);
+            color: white;
+            letter-spacing: -0.01em;
+        }
+
+        .globe-description {
+            font-size: var(--font-size-sm);
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.7;
+            margin-bottom: var(--space-6);
+            flex: 1;
+        }
+
+        /* Card footer with status */
+        .globe-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: var(--space-4);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .globe-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all var(--transition-base);
+        }
+
+        .status-live {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-success-100);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .status-live::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--color-success-500);
+            border-radius: 50%;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        }
+
+        .status-coming-soon {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--color-warning-100);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .globe-card:hover .status-live {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Launch icon (arrow) */
+        .launch-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+        }
+
+        .launch-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--color-primary-300);
+            transition: transform var(--transition-bounce);
+        }
+
+        .globe-card:hover .launch-icon {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateX(4px);
+        }
+
+        .globe-card:hover .launch-icon svg {
+            transform: translate(2px, -2px);
+        }
+
+        /* Disabled state */
+        .globe-card.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .globe-card.disabled:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+
+        .globe-card.disabled::before {
+            opacity: 0;
+        }
+
+        .globe-card.disabled .globe-icon-container {
+            background: rgba(100, 100, 100, 0.1);
+        }
+
+        .globe-card.disabled:hover .globe-icon-container {
+            transform: none;
+            background: rgba(100, 100, 100, 0.1);
+        }
+
+        .globe-card.disabled:hover .globe-icon {
+            transform: none;
+        }
+
+        .globe-card.disabled .launch-icon {
+            display: none;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: var(--font-size-sm);
+            animation: fadeIn 1s var(--transition-base) 0.8s backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        footer p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        footer a {
+            color: var(--color-primary-300);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        footer a:hover {
+            color: var(--color-primary-100);
+        }
+
+        /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-6) var(--space-4);
+            }
+
+            .header {
+                margin-bottom: var(--space-12);
+            }
+
+            .header h1 {
+                font-size: var(--font-size-4xl);
+            }
+
+            .header p {
+                font-size: var(--font-size-base);
+            }
+
+            .globe-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-6);
+            }
+
+            .globe-card {
+                padding: var(--space-6);
+            }
+
+            .globe-icon-container {
+                width: 64px;
+                height: 64px;
+            }
+
+            .globe-icon {
+                font-size: 36px;
+            }
+
+            .globe-title {
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .globe-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .globe-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Accessibility: Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body::before,
+            .particle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles for ambient effect -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 25%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 45%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 75%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+
+    <div class="page-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-badge">
+                <span class="header-badge-icon"></span>
+                <span>Interactive 3D Data Visualizations</span>
+            </div>
+            <h1>🌍 Globe Explorer</h1>
+            <p>Explore stunning 3D globe visualizations of global data. Choose from carbon emissions, climate patterns, population dynamics, and more.</p>
+        </header>
+
+        <!-- Globe Grid -->
+        <div class="globe-grid">
+            <!-- Carbon Emissions Globe -->
+            <a href="globes/carbon/index.html" class="globe-card" aria-label="Explore Carbon Globe - Live">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">🌍</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Carbon Globe</h2>
+                    <p class="globe-description">
+                        Explore global carbon emissions, per capita data, and trends across 40+ countries. See emissions by sector and compare nations.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-live">Live</span>
+                        <div class="launch-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="7" y1="17" x2="17" y2="7"></line>
+                                <polyline points="7 7 17 7 17 17"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Temperature Globe -->
+            <div class="globe-card disabled" role="article" aria-label="Temperature Globe - Coming Soon">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">🌡️</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Temperature Globe</h2>
+                    <p class="globe-description">
+                        Visualize global temperature changes and climate patterns. Track historical warming trends and future projections.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-coming-soon">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Population Globe -->
+            <div class="globe-card disabled" role="article" aria-label="Population Globe - Coming Soon">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">👥</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Population Globe</h2>
+                    <p class="globe-description">
+                        Explore population density, growth rates, and demographic data across countries and regions worldwide.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-coming-soon">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ocean Health Globe -->
+            <div class="globe-card disabled" role="article" aria-label="Ocean Health Globe - Coming Soon">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">🌊</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Ocean Health Globe</h2>
+                    <p class="globe-description">
+                        Track ocean temperature, acidity, plastic pollution, and marine biodiversity across the world's oceans.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-coming-soon">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biodiversity Globe -->
+            <a href="globes/biodiversity/index.html" class="globe-card" aria-label="Explore Biodiversity Globe - Live">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">🦁</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Biodiversity Globe</h2>
+                    <p class="globe-description">
+                        Discover wildlife, 3D animals, forests, and biodiversity hotspots across 25+ countries with interactive visualization.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-live">Live</span>
+                        <div class="launch-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="7" y1="17" x2="17" y2="7"></line>
+                                <polyline points="7 7 17 7 17 17"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Energy Globe -->
+            <div class="globe-card disabled" role="article" aria-label="Energy Globe - Coming Soon">
+                <div class="globe-icon-container">
+                    <div class="globe-icon">⚡</div>
+                </div>
+                <div class="globe-card-content">
+                    <h2 class="globe-title">Energy Globe</h2>
+                    <p class="globe-description">
+                        Compare renewable vs fossil fuel usage, energy consumption patterns, and the transition to clean energy.
+                    </p>
+                    <div class="globe-card-footer">
+                        <span class="globe-status status-coming-soon">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                <span>Built with Three.js and Globe.gl</span>
+                <span>•</span>
+                <span>Data from trusted global sources</span>
+                <span>•</span>
+                <span>Open Source</span>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

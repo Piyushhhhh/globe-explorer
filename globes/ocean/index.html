@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Health Globe - Marine Conservation Explorer</title>
+    <link rel="stylesheet" href="ocean-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🌊 Ocean Health Globe</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="legend">
+                    <h4>Ocean Health</h4>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #10b981;"></span>
+                        <span>Excellent (80-100)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #3b82f6;"></span>
+                        <span>Good/Moderate (60-79)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #f59e0b;"></span>
+                        <span>Poor (50-59)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ef4444;"></span>
+                        <span>Critical (&lt;50)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div class="info-header">
+                    <div class="country-flag">🌊</div>
+                    <h2 class="country-name">Welcome to Ocean Health Globe</h2>
+                    <div class="country-rank">Marine Conservation Explorer</div>
+                </div>
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                        <p style="margin-bottom: 16px;">Click on any coastal country to explore ocean health data, marine life, and conservation status.</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Countries are color-coded by ocean health score</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌊</div>
+                    <span class="stat-value">75+</span>
+                    <span class="stat-label">Coastal Countries</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🐠</div>
+                    <span class="stat-value">8.1%</span>
+                    <span class="stat-label">Protected Areas</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌡️</div>
+                    <span class="stat-value">+1.2°C</span>
+                    <span class="stat-label">Sea Temp Rise</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Ocean Health Data...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="ocean-data.js"></script>
+    <script src="ocean-globe.js"></script>
+</body>
+</html>

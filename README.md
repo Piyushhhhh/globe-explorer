@@ -1,21 +1,42 @@
 # 🌍 Globe Explorer
 
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge&logo=vercel)](https://globe-explorer-psi.vercel.app)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
+[![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js)](https://threejs.org/)
+
 **Explore our planet through interactive 3D visualizations.** Travel through time, compare countries, and discover global patterns in population, climate, biodiversity, and ocean health.
 
 Built with **Three.js** and **Globe.gl** for buttery-smooth 60fps 3D experiences.
+
+## 🚀 Live Demo
+
+### **[🌐 Explore Live →](https://globe-explorer-psi.vercel.app)**
+
+Experience all 5 live globes instantly - no installation required!
+
+**What you'll find:**
+- 🌍 **Carbon Globe** - Emissions data across 190 countries
+- 👥 **Population Globe** - Time travel through 100 years (1950-2050)
+- 🌡️ **Temperature Globe** - Climate change visualization
+- 🌊 **Ocean Health Globe** - Marine conservation tracking
+- 🦁 **Biodiversity Globe** - 178 countries with 3D animals
+- ⚡ **Energy Globe** - Renewable vs fossil fuel tracking
 
 ![Globe Explorer Preview](preview.png)
 
 ## 📈 Project Stats
 
-- **5 Live Globes** - Carbon, Population, Ocean, Biodiversity, Temperature
+- **🌐 Live Production** - [Deployed on Vercel](https://globe-explorer-psi.vercel.app)
+- **6 Live Globes** - Carbon, Population, Temperature, Ocean, Biodiversity, Energy
 - **300+ Countries** - Comprehensive global coverage
 - **100 Years of Data** - From 1950 to 2050 projections
 - **Time Travel** - Interactive sliders on Population & Temperature
+- **80+ Energy Nations** - Renewable energy tracking
 - **75+ Ocean Countries** - Marine health tracking
 - **178 Biodiversity Nations** - Including Antarctica!
 - **Real-time Updates** - Stats update as you explore history
 - **0 Dependencies** - Pure vanilla JavaScript (except Three.js)
+- **60 FPS Performance** - Buttery smooth on all devices
 
 ## 🎯 Available Globes
 
@@ -112,8 +133,16 @@ Visualize global temperature changes and climate patterns over time.
 
 ---
 
-### ⚡ Energy Globe 🔜 Coming Soon
-Compare renewable vs fossil fuel usage and the transition to clean energy.
+### ⚡ Energy Globe ✅ LIVE
+Compare renewable vs fossil fuel usage and energy consumption patterns across 80+ countries.
+
+**Features:**
+- Renewable energy percentage by country
+- Fossil fuel dependency tracking
+- Clean energy transition progress
+- Energy consumption per capita
+- Solar, wind, hydro, and nuclear breakdowns
+- Color-coded by renewable energy adoption
 
 ## Tech Stack
 
@@ -187,16 +216,25 @@ All data represents latest available estimates (2023-2026) with historical conte
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Option 1: Live Demo (Instant) ⚡
 
+**[👉 Visit Live Site](https://globe-explorer-psi.vercel.app)** - Start exploring immediately!
+
+No installation needed. Works on all devices.
+
+---
+
+### Option 2: Run Locally (For Developers)
+
+**Prerequisites:**
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - Local web server (for ES modules)
 
-### Quick Start
+**Quick Start:**
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/YOUR_USERNAME/globe-explorer.git
+git clone https://github.com/Piyushhhhh/globe-explorer.git
 cd globe-explorer
 ```
 
@@ -221,12 +259,14 @@ http://localhost:8000
 
 ### First-Time Users
 
-**Recommended path:**
+**[🌐 Visit the Live Demo](https://globe-explorer-psi.vercel.app)** and follow this path:
+
 1. Start with **Population Globe** → Use time slider → Press `Space` to play
 2. Try **Biodiversity Globe** → Click countries → See 3D animals
 3. Explore **Ocean Globe** → Discover marine health
 4. Time-travel in **Temperature Globe** → Watch climate change
-5. Check **Carbon Globe** → Analyze emissions data
+5. Check **Energy Globe** → Track renewable energy adoption
+6. Analyze **Carbon Globe** → Study emissions data
 
 ## 🎮 Usage
 
@@ -493,6 +533,29 @@ MIT License - Feel free to use for any purpose
 - Environmental organizations
 
 Built with ❤️ for planetary awareness and education.
+
+## 🌐 Deployment
+
+**Live Site:** [https://globe-explorer-psi.vercel.app](https://globe-explorer-psi.vercel.app)
+
+**Hosted on:** [Vercel](https://vercel.com) (Free tier)
+
+### Deploy Your Own
+
+**Fork and deploy in 3 clicks:**
+
+1. Fork this repository on GitHub
+2. Sign up on [Vercel](https://vercel.com/signup) with GitHub
+3. Import your forked repo → Deploy automatically
+
+**Alternative Hosting:**
+- **GitHub Pages**: Enable in repo settings → Pages
+- **Netlify**: Drag & drop or connect GitHub
+- **Cloudflare Pages**: Connect GitHub for auto-deploy
+
+All hosting options are **100% free** for this project!
+
+---
 
 ## Contact
 

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://unpkg.com data:; connect-src 'self' https://raw.githubusercontent.com; font-src 'self';">
+    <title>Carbon Globe - Global Carbon Footprint Explorer</title>
+    <link rel="stylesheet" href="carbon-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🌍 Carbon Globe</h1>
+            <p class="subtitle">Explore carbon emissions across the world</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="zoom-hint" id="zoomHint">
+                    🔍 Zoom in to see state borders and more details
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div class="info-header">
+                    <div class="country-flag">🌍</div>
+                    <h2 class="country-name">Welcome to Carbon Globe</h2>
+                    <div class="country-rank">Interactive Emissions Explorer</div>
+                </div>
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                        <p style="margin-bottom: 16px;">Click on any country to explore detailed carbon emission data, trends, and insights.</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Countries are subtly color-coded by emission levels</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value" id="globalEmissions">37.1 Gt</span>
+                    <span class="stat-label">Global CO₂ (2023)</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">👤</div>
+                    <span class="stat-value" id="avgPerCapita">4.7 tons</span>
+                    <span class="stat-label">Avg Per Capita</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏆</div>
+                    <span class="stat-value" id="topEmitter">China</span>
+                    <span class="stat-label">Top Emitter</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Carbon Data...</p>
+    </div>
+
+    <!-- Scripts (order matters: config → modules → data → validator → app) -->
+    <script src="../../core/config.js"></script>
+    <script src="../../core/ui-helpers.js"></script>
+    <script src="../../core/animation-engine.js"></script>
+    <script src="../../core/state-machine.js"></script>
+    <script src="../../core/gesture-handler.js"></script>
+    <script src="../../core/data-loader.js"></script>
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="carbon-data.js"></script>
+    <script src="../../core/data-validator.js"></script>
+    <script src="carbon-globe.js"></script>
+</body>
+</html>

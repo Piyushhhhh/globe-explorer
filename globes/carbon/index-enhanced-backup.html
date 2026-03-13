@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Globe - Interactive Global Emissions Explorer</title>
+    <meta name="description" content="Explore carbon emissions data across the world with an interactive 3D globe. Discover emission trends, compare countries, and understand climate impact.">
+    <link rel="stylesheet" href="styles-enhanced.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Enhanced Header -->
+        <header role="banner">
+            <h1>🌍 Carbon Globe</h1>
+            <p class="subtitle">Interactive Global Emissions Explorer</p>
+        </header>
+
+        <!-- Search & Filters Toolbar -->
+        <div class="toolbar" role="search">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search country or region..."
+                    aria-label="Search countries"
+                    autocomplete="off"
+                >
+                <div id="searchResults" class="search-results" role="listbox"></div>
+            </div>
+
+            <!-- Interactive Legend -->
+            <div class="legend-panel" role="region" aria-label="Emission levels legend">
+                <div class="legend-title">Emission Levels</div>
+                <div class="legend-item" data-level="low" tabindex="0" role="button">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #10b981, #059669);"></div>
+                    <div class="legend-label">Low (&lt; 5 tons/capita)</div>
+                </div>
+                <div class="legend-item" data-level="medium" tabindex="0" role="button">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div>
+                    <div class="legend-label">Medium (5-10 tons)</div>
+                </div>
+                <div class="legend-item" data-level="high" tabindex="0" role="button">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+                    <div class="legend-label">High (&gt; 10 tons/capita)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content" role="main">
+            <!-- Globe Container -->
+            <div class="globe-container" role="region" aria-label="Interactive 3D globe">
+                <div id="globe"></div>
+
+                <!-- Enhanced Controls -->
+                <div class="controls" role="toolbar" aria-label="Globe controls">
+                    <button
+                        id="resetView"
+                        class="control-btn"
+                        aria-label="Reset globe view"
+                    >
+                        <span aria-hidden="true">🔄</span> Reset View
+                    </button>
+                    <button
+                        id="autoRotate"
+                        class="control-btn control-btn-secondary"
+                        aria-label="Toggle auto rotation"
+                        aria-pressed="false"
+                    >
+                        <span aria-hidden="true">🔁</span> Auto Rotate
+                    </button>
+                    <button
+                        id="compareMode"
+                        class="control-btn control-btn-secondary"
+                        aria-label="Compare countries"
+                    >
+                        <span aria-hidden="true">📊</span> Compare
+                    </button>
+                </div>
+
+                <div class="zoom-hint" id="zoomHint" role="status" aria-live="polite">
+                    🔍 Zoom in to see state borders • Click countries for details
+                </div>
+            </div>
+
+            <!-- Enhanced Info Panel -->
+            <aside class="info-panel" id="infoPanel" role="complementary" aria-label="Country details">
+                <button
+                    class="close-panel"
+                    id="closePanel"
+                    aria-label="Close panel"
+                >
+                    ✕
+                </button>
+
+                <div class="info-header">
+                    <div class="country-flag" aria-hidden="true">🌍</div>
+                    <h2 class="country-name">Welcome to Carbon Globe</h2>
+                    <div class="country-rank">Interactive Emissions Explorer</div>
+                </div>
+
+                <div class="info-content">
+                    <div style="color: rgba(255,255,255,0.85); text-align: center; padding: var(--space-4); line-height: 1.8;">
+                        <p style="margin-bottom: var(--space-4); font-size: var(--font-size-base);">
+                            <strong>Click any country</strong> to explore detailed carbon emission data, historical trends, and climate insights.
+                        </p>
+                        <p style="font-size: var(--font-size-sm); opacity: 0.7;">
+                            💡 Use the search bar to quickly find countries<br>
+                            🎨 Countries are color-coded by emission levels<br>
+                            🔍 Zoom in for more geographic details
+                        </p>
+                    </div>
+
+                    <!-- Quick Stats Preview -->
+                    <div class="metric-card">
+                        <div class="metric-icon">🌐</div>
+                        <div class="metric-details">
+                            <div class="metric-label">Global Coverage</div>
+                            <div class="metric-value">206<span class="metric-unit">countries</span></div>
+                        </div>
+                    </div>
+
+                    <div class="context-card">
+                        <div class="context-icon">💡</div>
+                        <div class="context-text">
+                            Start exploring by clicking any country on the globe or using the search feature above.
+                            Compare emissions, view trends, and understand the global carbon footprint.
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Enhanced Footer Stats -->
+        <footer role="contentinfo">
+            <div class="stats">
+                <div class="stat-item" role="status">
+                    <span class="stat-value" id="globalEmissions">37.1 Gt</span>
+                    <span class="stat-label">Global CO₂ (2023)</span>
+                </div>
+                <div class="stat-item" role="status">
+                    <span class="stat-value" id="avgPerCapita">4.7 tons</span>
+                    <span class="stat-label">Avg Per Capita</span>
+                </div>
+                <div class="stat-item" role="status">
+                    <span class="stat-value" id="topEmitter">China</span>
+                    <span class="stat-label">Top Emitter</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading Global Emissions Data...</p>
+        <span class="sr-only">Please wait while we load the carbon emissions data</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+    <script src="app-enhancements.js"></script>
+</body>
+</html>

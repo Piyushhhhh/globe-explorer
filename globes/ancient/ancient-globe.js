@@ -41,9 +41,9 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites with clean minimal markers
+// Add ancient sites with ultra-minimal professional markers
 function addAncientSites() {
-    console.log(`Adding ${ancientSites.length} ancient sites with clean markers`);
+    console.log(`Adding ${ancientSites.length} ancient sites with minimal markers`);
 
     globe.htmlElementsData(ancientSites)
         .htmlLat('lat')
@@ -53,112 +53,78 @@ function addAncientSites() {
         .htmlElement(d => {
             const el = document.createElement('div');
             el.style.cssText = `
-                width: 36px;
-                height: 36px;
+                width: 20px;
+                height: 20px;
                 cursor: pointer;
                 pointer-events: auto;
                 transform: translate(-50%, -50%);
                 will-change: transform;
                 position: relative;
+                opacity: 0.7;
+                transition: opacity 0.3s ease;
             `;
 
             // Period-based colors
             const colors = {
-                ancient: '#cd7f32',
-                classical: '#b87333',
-                medieval: '#d4af37'
+                ancient: '#d4af37',
+                classical: '#e6b800',
+                medieval: '#ffcc00'
             };
             const color = colors[d.period] || colors.ancient;
 
-            // Create clean marker with icon
-            if (d.markerImage) {
-                el.innerHTML = `
-                    <div class="monument-marker" style="
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0, 0, 0, 0.7);
-                        backdrop-filter: blur(8px);
-                        border-radius: 50%;
-                        padding: 7px;
-                        box-shadow:
-                            0 0 0 2px ${color},
-                            0 0 20px ${color}60,
-                            0 4px 12px rgba(0, 0, 0, 0.3);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            // Ultra-minimal marker
+            el.innerHTML = `
+                <div class="monument-marker" style="
+                    width: 100%;
+                    height: 100%;
+                    background: ${color};
+                    border-radius: 50%;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                    transition: all 0.25s ease;
+                    pointer-events: none;
+                "></div>
+                ${d.unesco ? `
+                    <div class="unesco-badge" style="
+                        position: absolute;
+                        top: -4px;
+                        right: -4px;
+                        font-size: 10px;
+                        opacity: 0;
+                        transition: opacity 0.25s ease;
                         pointer-events: none;
-                    ">
-                        <img src="${d.markerImage}"
-                             style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 4px ${color}); pointer-events: none;"
-                             onerror="this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='18px'; this.parentElement.style.color='${color}';">
-                    </div>
-                    ${d.unesco ? `
-                        <div style="
-                            position: absolute;
-                            top: -6px;
-                            right: -6px;
-                            font-size: 14px;
-                            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-                            pointer-events: none;
-                            animation: float 3s ease-in-out infinite;
-                        ">🏆</div>
-                    ` : ''}
-                `;
-            } else {
-                // Fallback to simple glowing dot
-                el.innerHTML = `
-                    <div class="monument-marker" style="
-                        width: 100%;
-                        height: 100%;
-                        background: ${color};
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 18px;
-                        box-shadow:
-                            0 0 0 2px rgba(255, 255, 255, 0.8),
-                            0 0 20px ${color},
-                            0 4px 12px rgba(0, 0, 0, 0.3);
-                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                        pointer-events: none;
-                    ">${d.icon}</div>
-                `;
-            }
+                    ">🏆</div>
+                ` : ''}
+            `;
 
             // Hover effects
             el.addEventListener('mouseenter', () => {
+                el.style.opacity = '1';
                 const marker = el.querySelector('.monument-marker');
+                const badge = el.querySelector('.unesco-badge');
+
                 if (marker) {
-                    marker.style.transform = 'scale(1.4)';
-                    marker.style.boxShadow = `
-                        0 0 0 3px ${color},
-                        0 0 40px ${color}cc,
-                        0 8px 24px rgba(0, 0, 0, 0.4)
-                    `;
+                    marker.style.transform = 'scale(2)';
+                    marker.style.boxShadow = `0 0 0 2px ${color}, 0 4px 12px rgba(0, 0, 0, 0.4)`;
+                }
+
+                if (badge) {
+                    badge.style.opacity = '1';
                 }
             });
 
             el.addEventListener('mouseleave', () => {
                 if (selectedSite !== d.name) {
+                    el.style.opacity = '0.7';
                     const marker = el.querySelector('.monument-marker');
+                    const badge = el.querySelector('.unesco-badge');
+
                     if (marker) {
                         marker.style.transform = 'scale(1)';
-                        if (d.markerImage) {
-                            marker.style.boxShadow = `
-                                0 0 0 2px ${color},
-                                0 0 20px ${color}60,
-                                0 4px 12px rgba(0, 0, 0, 0.3)
-                            `;
-                        } else {
-                            marker.style.boxShadow = `
-                                0 0 0 2px rgba(255, 255, 255, 0.8),
-                                0 0 20px ${color},
-                                0 4px 12px rgba(0, 0, 0, 0.3)
-                            `;
-                        }
+                        marker.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+                    }
+
+                    if (badge) {
+                        badge.style.opacity = '0';
                     }
                 }
             });
@@ -178,16 +144,6 @@ function addAncientSites() {
 
             return el;
         });
-
-    // Add floating animation for UNESCO badges
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-4px); }
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 // Show route information panel

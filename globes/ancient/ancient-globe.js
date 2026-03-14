@@ -19,8 +19,8 @@ function initGlobe() {
     // Set initial view
     globe.pointOfView({ altitude: 2.5 });
 
-    // Add ancient sites as custom points
-    addAncientSites();
+    // Add ancient sites as 3D objects
+    addAncientSites3D();
 
     // Add trade routes
     addTradeRoutes();
@@ -41,55 +41,201 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites as markers
-function addAncientSites() {
-    globe.htmlElementsData(ancientSites)
-        .htmlElement(d => {
-            const el = document.createElement('div');
-            el.innerHTML = d.icon || '🏛️';
-            el.style.fontSize = '24px';
-            el.style.cursor = 'pointer';
-            el.style.userSelect = 'none';
-            el.style.pointerEvents = 'auto';
-            el.style.filter = 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.8))';
-            el.style.transition = 'all 0.3s ease';
+// Create 3D monument objects
+function create3DMonument(site) {
+    if (!window.THREE) {
+        console.error('THREE.js not loaded');
+        return new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3));
+    }
 
-            // Period-based glow
-            const glowColors = {
-                ancient: 'rgba(205, 127, 50, 0.8)',
-                classical: 'rgba(184, 115, 51, 0.8)',
-                medieval: 'rgba(139, 105, 20, 0.8)'
+    const THREE = window.THREE;
+
+    // Period-based colors
+    const colorMap = {
+        ancient: 0xcd7f32,    // Bronze
+        classical: 0xb87333,  // Copper
+        medieval: 0x8b6914    // Dark goldenrod
+    };
+
+    const color = colorMap[site.period] || colorMap.ancient;
+    const name = site.name.toLowerCase();
+    const type = (site.type || '').toLowerCase();
+
+    // Material for all monuments
+    const material = new THREE.MeshLambertMaterial({
+        color: color,
+        emissive: 0x8b6914,
+        emissiveIntensity: 0.3
+    });
+
+    let monument;
+
+    // Create appropriate geometry based on monument type
+    if (name.includes('pyramid') || name.includes('giza')) {
+        // Pyramid shape (4-sided cone)
+        const geometry = new THREE.ConeGeometry(0.35, 0.7, 4);
+        monument = new THREE.Mesh(geometry, material);
+        monument.rotation.y = Math.PI / 4; // Align faces
+    }
+    else if (name.includes('wall') || name.includes('great wall')) {
+        // Wall segment (elongated box)
+        const geometry = new THREE.BoxGeometry(0.8, 0.25, 0.15);
+        monument = new THREE.Mesh(geometry, material);
+    }
+    else if (name.includes('colosseum') || name.includes('amphitheatre')) {
+        // Circular arena
+        const geometry = new THREE.CylinderGeometry(0.35, 0.4, 0.4, 16, 1, true);
+        monument = new THREE.Mesh(geometry, material);
+    }
+    else if (name.includes('temple') || name.includes('angkor') || name.includes('borobudur') || name.includes('parthenon')) {
+        // Temple with stepped levels (ziggurat style)
+        monument = new THREE.Group();
+
+        const baseMat = material.clone();
+        const midMat = material.clone();
+        const topMat = material.clone();
+
+        const base = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.5), baseMat);
+        const mid = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.15, 0.35), midMat);
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.25, 0.2), topMat);
+
+        base.position.y = 0.075;
+        mid.position.y = 0.225;
+        top.position.y = 0.425;
+
+        monument.add(base);
+        monument.add(mid);
+        monument.add(top);
+    }
+    else if (name.includes('stone') || name.includes('henge')) {
+        // Standing stone pillar
+        const geometry = new THREE.CylinderGeometry(0.08, 0.1, 0.6, 8);
+        monument = new THREE.Mesh(geometry, material);
+    }
+    else if (name.includes('petra') || type.includes('sanctuary')) {
+        // Carved facade (flat with some depth)
+        const geometry = new THREE.BoxGeometry(0.4, 0.6, 0.15);
+        monument = new THREE.Mesh(geometry, material);
+    }
+    else if (type.includes('city')) {
+        // City - cluster of 3 buildings
+        monument = new THREE.Group();
+
+        const heights = [0.4, 0.5, 0.35];
+        const positions = [
+            { x: -0.15, z: 0 },
+            { x: 0.15, z: 0.1 },
+            { x: 0, z: -0.15 }
+        ];
+
+        for (let i = 0; i < 3; i++) {
+            const building = new THREE.BoxGeometry(0.15, heights[i], 0.15);
+            const mesh = new THREE.Mesh(building, material.clone());
+            mesh.position.x = positions[i].x;
+            mesh.position.z = positions[i].z;
+            mesh.position.y = heights[i] / 2;
+            monument.add(mesh);
+        }
+    }
+    else {
+        // Default: simple monument obelisk
+        const geometry = new THREE.CylinderGeometry(0.1, 0.15, 0.5, 6);
+        monument = new THREE.Mesh(geometry, material);
+    }
+
+    return monument;
+}
+
+// Add ancient sites as 3D objects
+function addAncientSites3D() {
+    const THREE = window.THREE;
+    let hoveredObj = null;
+
+    globe.objectsData(ancientSites)
+        .objectLat('lat')
+        .objectLng('lng')
+        .objectAltitude(0.01)
+        .objectThreeObject(d => {
+            const monument = create3DMonument(d);
+
+            // Add subtle glow effect around monument
+            const glowGeometry = new THREE.SphereGeometry(0.45, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xd4af37,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+
+            const group = new THREE.Group();
+            group.add(monument);
+            group.add(glow);
+
+            // Store references
+            group.userData = {
+                site: d,
+                monument,
+                glow,
+                defaultScale: 1,
+                glowDefaultOpacity: 0.2
             };
-            el.style.filter = `drop-shadow(0 0 6px ${glowColors[d.period] || glowColors.ancient})`;
 
-            // Hover effect
-            el.addEventListener('mouseenter', () => {
-                el.style.transform = 'scale(1.5)';
-                el.style.filter = 'drop-shadow(0 0 12px rgba(212, 175, 55, 1))';
-            });
+            return group;
+        })
+        .objectLabel(d => `
+            <div style="
+                background: rgba(244, 232, 208, 0.95);
+                padding: 10px 14px;
+                border-radius: 12px;
+                border: 2px solid #8b6914;
+                font-family: 'Patrick Hand', cursive;
+                color: #2d2d2d;
+                box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                max-width: 220px;
+            ">
+                <div style="font-family: 'Cinzel', serif; font-weight: bold; font-size: 16px; margin-bottom: 4px;">
+                    ${d.icon} ${d.name}
+                </div>
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">
+                    ${d.civilization}
+                </div>
+                <div style="font-size: 11px; color: #8b6914;">
+                    Founded: ${d.founded}
+                </div>
+                ${d.unesco ? '<div style="margin-top: 6px; font-size: 11px; color: #d4af37;">🏆 UNESCO World Heritage</div>' : ''}
+            </div>
+        `)
+        .onObjectClick((d, event, { object }) => {
+            showSiteInfo(d);
+            selectedSite = d.name;
 
-            el.addEventListener('mouseleave', () => {
-                if (selectedSite !== d.name) {
-                    el.style.transform = 'scale(1)';
-                    el.style.filter = `drop-shadow(0 0 6px ${glowColors[d.period] || glowColors.ancient})`;
+            // Zoom to site
+            globe.pointOfView({
+                lat: d.lat,
+                lng: d.lng,
+                altitude: 1.5
+            }, 1000);
+        })
+        .onObjectHover((d, prevD, { object, prevObject }) => {
+            // Update cursor
+            document.body.style.cursor = d ? 'pointer' : 'default';
+
+            // Reset previous hovered object
+            if (prevObject && prevObject.userData) {
+                prevObject.scale.set(1, 1, 1);
+                if (prevObject.userData.glow) {
+                    prevObject.userData.glow.material.opacity = 0.2;
                 }
-            });
+            }
 
-            // Click handler
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showSiteInfo(d);
-                selectedSite = d.name;
-
-                // Zoom to site
-                globe.pointOfView({
-                    lat: d.lat,
-                    lng: d.lng,
-                    altitude: 1.5
-                }, 1000);
-            });
-
-            return el;
+            // Scale up current hovered object
+            if (object && object.userData) {
+                object.scale.set(1.4, 1.4, 1.4);
+                if (object.userData.glow) {
+                    object.userData.glow.material.opacity = 0.6;
+                }
+            }
         });
 }
 
@@ -210,10 +356,10 @@ function filterByPeriod(period) {
     currentFilter = period;
 
     if (period === 'all') {
-        globe.htmlElementsData(ancientSites);
+        globe.objectsData(ancientSites);
     } else {
         const filtered = ancientSites.filter(site => site.period === period);
-        globe.htmlElementsData(filtered);
+        globe.objectsData(filtered);
     }
 
     // Update legend active state

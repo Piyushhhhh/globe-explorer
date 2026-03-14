@@ -103,12 +103,17 @@
                         <span class="legend-icon">🔴</span>
                         <span>Earthquakes</span>
                     </div>
+                    <div class="legend-divider"></div>
                     <div class="legend-item">
-                        <span class="legend-icon">🌙</span>
+                        <span class="legend-color" style="background: rgba(20, 30, 70, 0.5);"></span>
                         <span>Night</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-icon">☀️</span>
+                        <span class="legend-color" style="background: rgba(255, 140, 70, 0.5);"></span>
+                        <span>Twilight</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: rgba(255, 255, 255, 0.3);"></span>
                         <span>Day</span>
                     </div>
                 </div>
@@ -134,19 +139,19 @@
                         <div class="feature-list">
                             <div class="feature-item">
                                 <span class="check-mark">✓</span>
-                                <span><strong>Day/Night cycle</strong> based on actual sun position</span>
+                                <span><strong>Realistic lighting</strong> - dark blue = night, orange = twilight (dawn/dusk), bright = day</span>
                             </div>
                             <div class="feature-item">
                                 <span class="check-mark">✓</span>
-                                <span><strong>ISS location</strong> updated every 5 seconds</span>
+                                <span><strong>ISS tracker</strong> - live position updated every 5 seconds</span>
                             </div>
                             <div class="feature-item">
                                 <span class="check-mark">✓</span>
-                                <span><strong>Live earthquakes</strong> from the last 24 hours</span>
+                                <span><strong>Live earthquakes</strong> - magnitude 2.5+ from last 24 hours</span>
                             </div>
                             <div class="feature-item">
                                 <span class="check-mark">✓</span>
-                                <span><strong>Time zones</strong> showing current local time</span>
+                                <span><strong>City lights mode</strong> - toggle to see nighttime city lights</span>
                             </div>
                         </div>
 
@@ -178,6 +183,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/globe.gl"></script>
     <script src="/globes/realtime/sun-calculator.js"></script>
+    <script src="/globes/realtime/day-night-shader.js"></script>
     <script src="/globes/realtime/realtime-data.js"></script>
     <script src="/globes/realtime/realtime-globe.js"></script>
 </body>

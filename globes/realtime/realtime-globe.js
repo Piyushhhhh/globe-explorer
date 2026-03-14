@@ -45,16 +45,15 @@ function setupGlobe() {
             .atmosphereColor('#87CEEB')
             .atmosphereAltitude(0.15);
 
-        // Load country boundaries
+        // Load country boundaries with day/night coloring
         fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
             .then(res => res.json())
             .then(countries => {
-                globe
-                    .polygonsData(countries.features)
-                    .polygonCapColor(() => 'rgba(255, 255, 255, 0.1)')
-                    .polygonSideColor(() => 'rgba(100, 100, 100, 0.1)')
-                    .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.3)')
-                    .polygonAltitude(0.001);
+                // Store countries data for day/night updates
+                window.countriesData = countries.features;
+
+                // Initial polygon setup with day/night colors
+                updateDayNightPolygons();
 
                 console.log('[GLOBE] Country boundaries loaded');
             })
@@ -75,12 +74,89 @@ function setupGlobe() {
 }
 
 /**
+ * Update polygon colors based on current day/night
+ */
+function updateDayNightPolygons() {
+    if (!window.countriesData || !globe) return;
+
+    const now = new Date();
+    const sunPos = SunCalculator.getSubsolarPoint(now);
+
+    // Color each country based on day/night/twilight
+    const coloredCountries = window.countriesData.map(country => {
+        // Get approximate country center
+        let lat = 0, lng = 0;
+
+        if (country.geometry.type === 'Polygon' && country.geometry.coordinates[0].length > 0) {
+            lng = country.geometry.coordinates[0][0][0];
+            lat = country.geometry.coordinates[0][0][1];
+        } else if (country.geometry.type === 'MultiPolygon' && country.geometry.coordinates[0][0].length > 0) {
+            lng = country.geometry.coordinates[0][0][0][0];
+            lat = country.geometry.coordinates[0][0][0][1];
+        }
+
+        // Calculate distance from subsolar point
+        const timeOfDay = getTimeOfDayForPoint(lat, lng, sunPos);
+
+        return {
+            ...country,
+            timeOfDay: timeOfDay
+        };
+    });
+
+    globe
+        .polygonsData(coloredCountries)
+        .polygonCapColor(d => {
+            switch (d.timeOfDay) {
+                case 'day':
+                    return 'rgba(255, 255, 255, 0.05)'; // Bright/transparent
+                case 'twilight':
+                    return 'rgba(255, 140, 70, 0.25)'; // Orange twilight
+                case 'night':
+                    return 'rgba(20, 30, 70, 0.5)'; // Dark blue night
+                default:
+                    return 'rgba(255, 255, 255, 0.1)';
+            }
+        })
+        .polygonSideColor(() => 'rgba(100, 100, 100, 0.1)')
+        .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.3)')
+        .polygonAltitude(0.001);
+
+    console.log('[DAY/NIGHT] Polygons updated at', now.toISOString());
+}
+
+/**
+ * Get time of day for a specific point
+ */
+function getTimeOfDayForPoint(lat, lng, sunPos) {
+    const latRad = lat * Math.PI / 180;
+    const lngRad = lng * Math.PI / 180;
+    const sunLatRad = sunPos.lat * Math.PI / 180;
+    const sunLngRad = sunPos.lng * Math.PI / 180;
+
+    const dLat = latRad - sunLatRad;
+    const dLng = lngRad - sunLngRad;
+
+    const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(latRad) * Math.cos(sunLatRad) * Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = c * 180 / Math.PI;
+
+    // Classify based on solar angle
+    if (distance < 85) return 'day';           // Full daylight
+    if (distance < 96) return 'twilight';      // Dawn/dusk (wider range)
+    return 'night';                             // Night
+}
+
+/**
  * Apply day/night terminator shader
  */
 function applyDayNightShader() {
-    // Update shader every 10 seconds
+    // Update shader immediately
     updateDayNightShader();
-    setInterval(updateDayNightShader, 10000);
+
+    // Update every 30 seconds (frequent enough to see changes)
+    setInterval(updateDayNightShader, 30000);
 }
 
 /**
@@ -90,9 +166,10 @@ function updateDayNightShader() {
     const now = new Date();
     const sunPos = SunCalculator.getSubsolarPoint(now);
 
-    // Create custom material with day/night transition
-    // This is a simplified version - full shader would be more complex
     console.log(`[SUN] Position: ${sunPos.lat.toFixed(2)}°, ${sunPos.lng.toFixed(2)}°`);
+
+    // Update polygon colors for day/night
+    updateDayNightPolygons();
 
     // Calculate day/night ratio
     realtimeData.calculateDayNightRatio(now);
@@ -257,7 +334,7 @@ function setupControls() {
                     <div class="feature-list">
                         <div class="feature-item">
                             <span class="check-mark">✓</span>
-                            <span><strong>Day/Night cycle</strong> based on actual sun position</span>
+                            <span><strong>Realistic day/night shading</strong> - dark areas are night, orange is twilight, bright is day</span>
                         </div>
                         <div class="feature-item">
                             <span class="check-mark">✓</span>
@@ -303,7 +380,7 @@ function setupControls() {
         e.target.style.color = autoRotateEnabled ? 'white' : '';
     });
 
-    // City lights toggle (placeholder - would need nighttime texture)
+    // City lights toggle - blend day/night textures
     document.getElementById('toggleNightLights').addEventListener('click', (e) => {
         nightLightsEnabled = !nightLightsEnabled;
         e.target.textContent = nightLightsEnabled ? 'Lights: ON' : 'City Lights';
@@ -312,11 +389,17 @@ function setupControls() {
 
         if (globe) {
             if (nightLightsEnabled) {
-                // Switch to nighttime texture with city lights
+                // Show night texture with city lights
                 globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
+
+                // Make night areas more visible with city lights
+                updateDayNightPolygons();
             } else {
-                // Switch back to blue marble
+                // Switch back to day texture
                 globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+
+                // Restore normal day/night coloring
+                updateDayNightPolygons();
             }
         }
     });

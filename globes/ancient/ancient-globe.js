@@ -139,6 +139,128 @@ function addAncientSites() {
         });
 }
 
+// Show route information panel
+function showRouteInfo(route) {
+    const panel = document.getElementById('infoPanel');
+    const content = document.getElementById('infoPanelContent');
+
+    // Default image if none provided
+    const imageUrl = route.image || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80';
+
+    content.innerHTML = `
+        <div class="info-header">
+            ${route.image ? `
+                <div style="
+                    width: 100%;
+                    height: 180px;
+                    overflow: hidden;
+                    border-radius: 15px;
+                    margin-bottom: 12px;
+                    border: 3px solid #8b6914;
+                    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                ">
+                    <img src="${imageUrl}" alt="${route.name}" style="
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    " onerror="this.src='https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80'">
+                </div>
+            ` : ''}
+            <div class="site-icon">${route.icon || '🛤️'}</div>
+            <h2 class="site-name">${route.name}</h2>
+            <div class="site-period">${route.period}</div>
+        </div>
+        <div class="info-content">
+            <!-- Main Description -->
+            <div style="
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: 15px;
+                border: 2px solid #8b6914;
+                line-height: 1.6;
+                margin-bottom: 8px;
+            ">
+                <div style="font-size: 14px; color: #2d2d2d;">
+                    ${route.description}
+                </div>
+            </div>
+
+            <!-- Distance & Duration -->
+            <div class="info-card" style="background: rgba(212, 175, 55, 0.15);">
+                <div class="info-icon">📏</div>
+                <div class="info-details">
+                    <div class="info-label">Distance & Duration</div>
+                    <div style="font-size: 13px; line-height: 1.5; color: #2d2d2d;">
+                        <strong>${route.distance}</strong><br>
+                        ${route.duration}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transportation Methods -->
+            <div class="info-card">
+                <div class="info-icon">🚛</div>
+                <div class="info-details">
+                    <div class="info-label">Transportation</div>
+                    <div style="font-size: 12px; line-height: 1.6; color: #2d2d2d;">
+                        ${route.transportation.map(t => `• ${t}`).join('<br>')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Goods Traded -->
+            <div class="info-card" style="background: rgba(16, 185, 129, 0.1);">
+                <div class="info-icon">📦</div>
+                <div class="info-details">
+                    <div class="info-label">Main Goods Traded</div>
+                    <div style="font-size: 12px; line-height: 1.6; color: #2d2d2d;">
+                        ${route.mainGoods.map(g => `• ${g}`).join('<br>')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Who Used This Route -->
+            <div class="info-card" style="background: rgba(139, 105, 20, 0.1);">
+                <div class="info-icon">👥</div>
+                <div class="info-details">
+                    <div class="info-label">Who Used This Route</div>
+                    <div style="font-size: 12px; line-height: 1.6; color: #2d2d2d;">
+                        ${route.whoUsed.map(w => `• ${w}`).join('<br>')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historical Significance -->
+            ${route.significance ? `
+                <div class="info-card" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(205, 127, 50, 0.2));">
+                    <div class="info-icon">⭐</div>
+                    <div class="info-details">
+                        <div class="info-label">Historical Significance</div>
+                        <div style="font-size: 13px; line-height: 1.5; color: #2d2d2d;">
+                            ${route.significance}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Key Cities -->
+            ${route.keyCities ? `
+                <div class="info-card">
+                    <div class="info-icon">🏙️</div>
+                    <div class="info-details">
+                        <div class="info-label">Key Cities Along Route</div>
+                        <div style="font-size: 12px; line-height: 1.6; color: #2d2d2d;">
+                            ${route.keyCities.join(' → ')}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    panel.classList.remove('hidden');
+}
+
 // Add trade routes as arcs
 function addTradeRoutes() {
     const routeArcs = [];
@@ -152,18 +274,19 @@ function addTradeRoutes() {
                 endLng: path.end.lng,
                 color: route.color,
                 name: route.name,
-                description: route.description
+                description: route.description,
+                routeData: route // Store full route data for click
             });
         });
     });
 
     globe.arcsData(routeArcs)
         .arcColor('color')
-        .arcStroke(0.8) // Thicker lines
-        .arcDashLength(0.4) // Longer dashes
-        .arcDashGap(0.15) // Smaller gaps
-        .arcDashAnimateTime(2500) // Faster animation
-        .arcAltitude(0.15) // Higher arc
+        .arcStroke(1.2) // Even thicker for better clickability
+        .arcDashLength(0.4)
+        .arcDashGap(0.15)
+        .arcDashAnimateTime(2500)
+        .arcAltitude(0.15)
         .arcLabel(d => `
             <div style="
                 background: linear-gradient(135deg, rgba(244, 232, 208, 0.98), rgba(232, 220, 192, 0.98));
@@ -175,6 +298,7 @@ function addTradeRoutes() {
                 box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
                 max-width: 250px;
                 backdrop-filter: blur(10px);
+                cursor: pointer;
             ">
                 <div style="
                     font-family: 'Cinzel', serif;
@@ -183,13 +307,31 @@ function addTradeRoutes() {
                     margin-bottom: 6px;
                     color: #8b6914;
                 ">
-                    🛤️ ${d.name}
+                    ${d.routeData.icon} ${d.name}
                 </div>
-                <div style="font-size: 13px; line-height: 1.5; opacity: 0.9;">
+                <div style="font-size: 13px; line-height: 1.5; opacity: 0.9; margin-bottom: 6px;">
                     ${d.description}
                 </div>
+                <div style="
+                    font-size: 11px;
+                    color: #d4af37;
+                    border-top: 1px solid rgba(139, 105, 20, 0.3);
+                    padding-top: 6px;
+                    margin-top: 6px;
+                ">
+                    🖱️ Click for full details
+                </div>
             </div>
-        `);
+        `)
+        .onArcClick((arc) => {
+            if (arc && arc.routeData) {
+                showRouteInfo(arc.routeData);
+                selectedSite = arc.name;
+            }
+        })
+        .onArcHover(arc => {
+            document.body.style.cursor = arc ? 'pointer' : 'default';
+        });
 }
 
 // Show site information panel

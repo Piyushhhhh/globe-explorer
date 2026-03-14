@@ -460,7 +460,33 @@ const tradeRoutes = [
             { start: { lat: 35.7, lng: 51.4 }, end: { lat: 41.9, lng: 12.5 } }  // Tehran to Rome
         ],
         color: "#d4af37",
-        description: "Ancient network of trade routes connecting East and West"
+        icon: "🐫",
+        description: "Ancient network of trade routes connecting East and West",
+        period: "~200 BCE - 1450 CE",
+        distance: "~6,400 km (4,000 miles)",
+        duration: "Journey took 6-12 months",
+        mainGoods: [
+            "Silk, porcelain, tea from China",
+            "Spices, gems, ivory from India",
+            "Gold, glass, wool from Rome",
+            "Horses, jade, precious metals"
+        ],
+        transportation: [
+            "Camel caravans (primary in deserts)",
+            "Horse and donkey pack trains",
+            "River boats on parts of route",
+            "Walking merchants with goods"
+        ],
+        whoUsed: [
+            "Chinese Han Dynasty merchants",
+            "Persian Sassanid traders",
+            "Roman Empire merchants",
+            "Sogdian middlemen (Central Asia)",
+            "Arab and Indian traders"
+        ],
+        significance: "Connected three continents and facilitated cultural exchange, spread of religions (Buddhism, Islam), and technological innovations. Greatest trade network in ancient history.",
+        keyCities: ["Xi'an (Chang'an)", "Samarkand", "Baghdad", "Damascus", "Constantinople", "Venice", "Rome"],
+        image: "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=600&q=80"
     },
     {
         name: "Spice Route",
@@ -469,7 +495,34 @@ const tradeRoutes = [
             { start: { lat: 13.0, lng: 80.2 }, end: { lat: 15.5, lng: 48.5 } }  // India to Yemen
         ],
         color: "#cd7f32",
-        description: "Maritime routes trading spices, silk, and precious goods"
+        icon: "⛵",
+        description: "Maritime routes trading spices, silk, and precious goods",
+        period: "~3000 BCE - 1500 CE",
+        distance: "~6,000 km (3,700 miles) by sea",
+        duration: "Journey took 3-6 months depending on monsoon winds",
+        mainGoods: [
+            "Black pepper, cinnamon, cardamom",
+            "Cloves, nutmeg, ginger",
+            "Sandalwood, precious stones",
+            "Silk, cotton textiles",
+            "Ivory, gold, pearls"
+        ],
+        transportation: [
+            "Dhow sailing ships (Indian Ocean)",
+            "Arab trading vessels",
+            "Chinese junks",
+            "Coastal galleys and barges"
+        ],
+        whoUsed: [
+            "Arab merchants (dominated trade)",
+            "Indian Tamil and Malayalam traders",
+            "Indonesian and Malay sailors",
+            "Roman and later European buyers",
+            "Chinese maritime expeditions"
+        ],
+        significance: "Made spices worth their weight in gold. Drove European Age of Exploration. Routes relied on monsoon wind patterns - summer winds northeast, winter southwest.",
+        keyCities: ["Calicut", "Colombo", "Aden", "Muscat", "Alexandria", "Venice", "Malacca"],
+        image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80"
     },
     {
         name: "Incense Route",
@@ -477,7 +530,32 @@ const tradeRoutes = [
             { start: { lat: 15.0, lng: 44.0 }, end: { lat: 31.8, lng: 35.2 } }  // Yemen to Jerusalem
         ],
         color: "#b87333",
-        description: "Ancient trade route for frankincense and myrrh"
+        icon: "🏜️",
+        description: "Ancient trade route for frankincense and myrrh",
+        period: "~1500 BCE - 300 CE",
+        distance: "~2,400 km (1,500 miles)",
+        duration: "Journey took 2-3 months",
+        mainGoods: [
+            "Frankincense (from Boswellia trees)",
+            "Myrrh (aromatic resin)",
+            "Balsam and other perfumes",
+            "Precious stones, gold"
+        ],
+        transportation: [
+            "Camel caravans (can carry 200kg each)",
+            "Donkey trains for smaller loads",
+            "Desert guides (Nabataeans specialized)"
+        ],
+        whoUsed: [
+            "Nabataean traders (controlled route)",
+            "Arab Bedouin merchants",
+            "Jewish traders to Jerusalem",
+            "Egyptian and Roman buyers",
+            "Sabaean kingdom merchants"
+        ],
+        significance: "Frankincense and myrrh were worth more than gold in ancient times. Used in religious ceremonies across Egypt, Greece, Rome, and Jerusalem. Made Nabataean kingdom wealthy.",
+        keyCities: ["Shabwa", "Ma'rib", "Petra", "Gaza", "Jerusalem"],
+        image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80"
     },
     {
         name: "Amber Road",
@@ -485,7 +563,68 @@ const tradeRoutes = [
             { start: { lat: 54.7, lng: 20.5 }, end: { lat: 41.9, lng: 12.5 } }  // Baltic to Rome
         ],
         color: "#daa520",
-        description: "Trade route for amber from the Baltic to Mediterranean"
+        icon: "🎨",
+        description: "Trade route for amber from the Baltic to Mediterranean",
+        period: "~3000 BCE - 500 CE",
+        distance: "~1,800 km (1,100 miles)",
+        duration: "Journey took 1-2 months",
+        mainGoods: [
+            "Baltic amber (fossilized tree resin)",
+            "Furs from northern forests",
+            "Timber, honey, wax",
+            "Salt from northern mines"
+        ],
+        transportation: [
+            "River boats on Vistula and Danube",
+            "Ox-drawn wagons overland",
+            "Pack horses through mountain passes",
+            "Small sailing vessels on rivers"
+        ],
+        whoUsed: [
+            "Germanic tribes (primary collectors)",
+            "Celtic middlemen traders",
+            "Etruscan and Roman buyers",
+            "Greek merchants",
+            "Nordic Vikings (later periods)"
+        ],
+        significance: "Amber was prized by Romans as 'gold of the north' for jewelry and medicine. Created early European trade network predating the Roman Empire.",
+        keyCities: ["Kaliningrad (ancient Sambia)", "Krakow", "Vienna", "Aquileia", "Rome"],
+        image: "https://images.unsplash.com/photo-1611689342806-0863700ce1e4?w=600&q=80"
+    },
+    {
+        name: "Trans-Saharan Trade Route",
+        paths: [
+            { start: { lat: 6.5, lng: -1.6 }, end: { lat: 33.9, lng: -6.9 } },  // Ghana to Morocco
+            { start: { lat: 12.6, lng: -8.0 }, end: { lat: 36.8, lng: 10.2 } }  // Mali to Tunisia
+        ],
+        color: "#e6b800",
+        icon: "🐪",
+        description: "Ancient caravan routes crossing the Sahara Desert",
+        period: "~500 BCE - 1500 CE",
+        distance: "~2,000 km (1,250 miles)",
+        duration: "Journey took 2-4 months",
+        mainGoods: [
+            "Gold from West African kingdoms",
+            "Salt from Saharan mines",
+            "Ivory, slaves",
+            "Kola nuts, leather goods"
+        ],
+        transportation: [
+            "Camel caravans (1000+ camels)",
+            "Only camels could survive desert",
+            "Berber guides essential",
+            "Travel only in cooler seasons"
+        ],
+        whoUsed: [
+            "Berber traders (North Africa)",
+            "West African kingdom merchants",
+            "Arab Muslim traders",
+            "Tuareg nomadic guides",
+            "Mali and Ghana empire traders"
+        ],
+        significance: "Salt was traded pound-for-pound for gold. Made Mali Empire wealthiest kingdom in Africa. Spread Islam across Sahara. Trade peaked under Mansa Musa (1312-1337).",
+        keyCities: ["Timbuktu", "Gao", "Marrakesh", "Fez", "Cairo", "Kumbi Saleh"],
+        image: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80"
     }
 ];
 

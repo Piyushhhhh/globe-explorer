@@ -25,8 +25,8 @@ function initGlobe() {
     // Add trade routes
     addTradeRoutes();
 
-    // Enable auto-rotation
-    globe.controls().autoRotate = true;
+    // Disable auto-rotation by default (user can enable via button)
+    globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.5;
 
     // Handle window resize
@@ -343,7 +343,7 @@ function initControls() {
     });
 
     // Auto-rotate toggle
-    let autoRotate = true;
+    let autoRotate = false;
     document.getElementById('autoRotate').addEventListener('click', (e) => {
         autoRotate = !autoRotate;
         globe.controls().autoRotate = autoRotate;

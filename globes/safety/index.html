@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Safety & Security Globe - Global Safety Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/globes/safety/safety-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🔒 Safety & Security Globe</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="legend">
+                    <h4>Safety Level</h4>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #10b981;"></span>
+                        <span>Very Safe</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #22c55e;"></span>
+                        <span>Safe</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #f59e0b;"></span>
+                        <span>Moderate</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ef4444;"></span>
+                        <span>Risky</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #dc2626;"></span>
+                        <span>Dangerous</span>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 2px dashed #2d2d2d; font-size: 11px; opacity: 0.8; line-height: 1.5;">
+                        <div style="margin-bottom: 6px;">Major countries labeled with names</div>
+                        <div style="margin-bottom: 6px;">🔴 Pulsing rings = Conflict zones</div>
+                        <div style="margin-bottom: 6px;">⚠️ Warning = High terror risk</div>
+                        <div>Red arcs = Migration routes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel hidden" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div id="infoPanelContent">
+                    <div class="info-header">
+                        <div class="country-flag">🛡️</div>
+                        <h2 class="country-name">Welcome to Safety & Security Globe</h2>
+                        <div class="country-rank">Global Safety Explorer</div>
+                    </div>
+                    <div class="info-content">
+                        <div style="color: rgba(45,45,45,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                            <p style="margin-bottom: 12px; font-weight: 600;">Click on any country to explore crime rates, political stability, personal safety scores, and detailed travel advisories.</p>
+                            <p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px;">Countries are color-coded by safety level (green = very safe, red = dangerous)</p>
+                            <p style="font-size: 13px; opacity: 0.6; margin-bottom: 8px;"><strong>Hover</strong> to see quick warnings and safety alerts</p>
+                            <p style="font-size: 13px; opacity: 0.6; margin-bottom: 8px;">🔴 Pulsing red rings = Active conflict zones</p>
+                            <p style="font-size: 13px; opacity: 0.6; margin-bottom: 8px;">⚠️ Warning icons = Extreme terrorism risk</p>
+                            <p style="font-size: 13px; opacity: 0.6;">Red arcs = Major refugee/migration routes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value">175</span>
+                    <span class="stat-label">Countries</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🛡️</div>
+                    <span class="stat-value">0-100</span>
+                    <span class="stat-label">Safety Index</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📊</div>
+                    <span class="stat-value">5 Tiers</span>
+                    <span class="stat-label">Risk Levels</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Safety Data...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="/globes/safety/safety-data.js"></script>
+    <script src="/globes/safety/safety-globe.js"></script>
+</body>
+</html>

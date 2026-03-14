@@ -72,29 +72,52 @@ function addAncientSites() {
             };
             const color = colors[d.period] || colors.ancient;
 
-            // Ultra-minimal marker
-            el.innerHTML = `
-                <div class="monument-marker" style="
-                    width: 100%;
-                    height: 100%;
-                    background: ${color};
-                    border-radius: 50%;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                    transition: all 0.25s ease;
-                    pointer-events: none;
-                "></div>
-                ${d.unesco ? `
-                    <div class="unesco-badge" style="
-                        position: absolute;
-                        top: -4px;
-                        right: -4px;
-                        font-size: 10px;
-                        opacity: 0;
-                        transition: opacity 0.25s ease;
+            // Minimal marker with icon
+            if (d.markerImage) {
+                el.innerHTML = `
+                    <div class="monument-marker" style="
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        border-radius: 50%;
+                        padding: 4px;
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.25s ease;
                         pointer-events: none;
-                    ">🏆</div>
-                ` : ''}
-            `;
+                    ">
+                        <img src="${d.markerImage}"
+                             style="width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.9;"
+                             onerror="this.parentElement.style.background='${color}'; this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='11px';">
+                    </div>
+                    ${d.unesco ? `
+                        <div class="unesco-badge" style="
+                            position: absolute;
+                            top: -4px;
+                            right: -4px;
+                            font-size: 10px;
+                            opacity: 0;
+                            transition: opacity 0.25s ease;
+                            pointer-events: none;
+                        ">🏆</div>
+                    ` : ''}
+                `;
+            } else {
+                // Fallback to simple dot
+                el.innerHTML = `
+                    <div class="monument-marker" style="
+                        width: 100%;
+                        height: 100%;
+                        background: ${color};
+                        border-radius: 50%;
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                        transition: all 0.25s ease;
+                        pointer-events: none;
+                    "></div>
+                `;
+            }
 
             // Hover effects
             el.addEventListener('mouseenter', () => {

@@ -2,9 +2,9 @@
 class TemperatureTimeline {
     constructor(globeInstance) {
         this.globe = globeInstance;
-        this.currentYear = 2023;
+        this.currentYear = 2026;
         this.minYear = 1880;
-        this.maxYear = 2023;
+        this.maxYear = 2026;
         this.isPlaying = false;
         this.playSpeed = 1; // 1 = slow (200ms), 2 = medium (100ms), 3 = fast (50ms)
         this.playInterval = null;
@@ -32,18 +32,13 @@ class TemperatureTimeline {
         container.className = 'timeline-container';
         container.innerHTML = `
             <div class="timeline-header">
-                <div class="timeline-year" id="timelineYear">2023</div>
+                <div class="timeline-year" id="timelineYear">2026</div>
                 <div class="timeline-info">
-                    <div class="timeline-temperature">
-                        <span class="label">Global Warming: </span>
-                        <span id="timelineTemperature">+1.35°C</span>
-                    </div>
-                    <div class="timeline-event" id="timelineEvent">Hottest year ever recorded</div>
+                    <div class="timeline-temperature" id="timelineTemperature">+1.48°C</div>
+                    <div class="timeline-event" id="timelineEvent">Current climate status</div>
                 </div>
                 <div class="timeline-controls">
-                    <button class="timeline-btn timeline-btn-small" id="timelineStepBack" title="Previous Year (←)">⏮</button>
                     <button class="timeline-btn" id="timelinePlay" title="Play/Pause (Space)">▶</button>
-                    <button class="timeline-btn timeline-btn-small" id="timelineStepForward" title="Next Year (→)">⏭</button>
                 </div>
             </div>
 
@@ -53,16 +48,12 @@ class TemperatureTimeline {
                     class="timeline-slider"
                     id="timelineSlider"
                     min="1880"
-                    max="2023"
-                    value="2023"
+                    max="2026"
+                    value="2026"
                     step="1"
                 />
-                <div class="timeline-milestone" style="left: 50%;" title="Baseline Period 1951-1980">
-                    📊 1951-1980
-                </div>
-                <div class="timeline-milestone" style="left: 82%;" title="Paris Agreement 2015">
-                    🌍 2015
-                </div>
+                <div class="timeline-milestone" style="left: 48%;">Baseline</div>
+                <div class="timeline-milestone" style="left: 92%;">Paris</div>
                 <div class="timeline-tooltip" id="timelineTooltip"></div>
             </div>
 
@@ -71,25 +62,8 @@ class TemperatureTimeline {
                 <span class="timeline-label">1920</span>
                 <span class="timeline-label">1951<br><small>Baseline</small></span>
                 <span class="timeline-label">1980</span>
-                <span class="timeline-label">2000</span>
-                <span class="timeline-label timeline-now" id="timelineNow">2023<br>NOW</span>
-            </div>
-
-            <div class="timeline-bottom-controls">
-                <div class="timeline-speed">
-                    <span class="timeline-speed-label">Speed:</span>
-                    <button class="timeline-speed-btn active" data-speed="1">Slow</button>
-                    <button class="timeline-speed-btn" data-speed="2">Medium</button>
-                    <button class="timeline-speed-btn" data-speed="3">Fast</button>
-                </div>
-                <div class="timeline-presets">
-                    <span class="timeline-speed-label">Jump to:</span>
-                    <button class="timeline-preset-btn" data-year="1880">📜 1880</button>
-                    <button class="timeline-preset-btn" data-year="1951">📊 1951</button>
-                    <button class="timeline-preset-btn" data-year="1997">📋 1997</button>
-                    <button class="timeline-preset-btn" data-year="2015">🌍 2015</button>
-                    <button class="timeline-preset-btn" data-year="2023">🔥 2023</button>
-                </div>
+                <span class="timeline-label">2020</span>
+                <span class="timeline-label timeline-now" id="timelineNow">NOW</span>
             </div>
         `;
 
@@ -150,7 +124,7 @@ class TemperatureTimeline {
         const nowBtn = document.getElementById('timelineNow');
         if (nowBtn) {
             nowBtn.addEventListener('click', () => {
-                this.setYear(2023);
+                this.setYear(2026);
             });
         }
 
@@ -239,17 +213,6 @@ class TemperatureTimeline {
         if (tempDisplay && globalAvg !== null) {
             const sign = globalAvg >= 0 ? '+' : '';
             tempDisplay.textContent = `${sign}${globalAvg.toFixed(2)}°C`;
-
-            // Color code based on temperature
-            if (globalAvg >= 1.0) {
-                tempDisplay.style.color = '#ef4444'; // Red
-            } else if (globalAvg >= 0.5) {
-                tempDisplay.style.color = '#fb923c'; // Orange
-            } else if (globalAvg >= 0) {
-                tempDisplay.style.color = '#fbbf24'; // Yellow
-            } else {
-                tempDisplay.style.color = '#60a5fa'; // Blue
-            }
         }
 
         // Update event description

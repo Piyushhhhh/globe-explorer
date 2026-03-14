@@ -17,10 +17,6 @@
         <header>
             <h1>🌡️ Temperature Globe</h1>
             <p class="subtitle">Explore global temperature changes and climate patterns</p>
-            <!-- Debug Button -->
-            <button id="debugTimeline" style="position: fixed; top: 80px; right: 20px; z-index: 9999; padding: 10px 20px; background: #fb923c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                🔧 Show Timeline (Debug)
-            </button>
         </header>
 
         <!-- Main Content -->
@@ -121,34 +117,6 @@
                     console.error('initializeTemperatureTimeline function not found!');
                 }
             }, 2000);
-        });
-
-        // Debug button handler
-        window.addEventListener('load', () => {
-            const btn = document.getElementById('debugTimeline');
-            if (btn) {
-                btn.addEventListener('click', () => {
-                    console.log('=== DEBUG BUTTON CLICKED ===');
-                    console.log('1. Globe exists:', typeof globe !== 'undefined');
-                    console.log('2. Globe value:', globe);
-                    console.log('3. initializeTemperatureTimeline:', typeof initializeTemperatureTimeline);
-                    console.log('4. TemperatureTimeline class:', typeof TemperatureTimeline);
-                    console.log('5. getGlobalAverage:', typeof getGlobalAverage);
-
-                    if (typeof initializeTemperatureTimeline === 'function') {
-                        alert('Attempting to initialize timeline...');
-                        try {
-                            initializeTemperatureTimeline();
-                            alert('Timeline initialized! Check bottom of page.');
-                        } catch(e) {
-                            alert('Error: ' + e.message);
-                            console.error(e);
-                        }
-                    } else {
-                        alert('ERROR: Timeline scripts not loaded!');
-                    }
-                });
-            }
         });
     </script>
 </body>

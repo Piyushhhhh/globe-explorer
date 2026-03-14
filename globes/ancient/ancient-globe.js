@@ -151,30 +151,43 @@ function addTradeRoutes() {
                 endLat: path.end.lat,
                 endLng: path.end.lng,
                 color: route.color,
-                name: route.name
+                name: route.name,
+                description: route.description
             });
         });
     });
 
     globe.arcsData(routeArcs)
         .arcColor('color')
-        .arcStroke(0.4)
-        .arcDashLength(0.3)
-        .arcDashGap(0.2)
-        .arcDashAnimateTime(4000)
-        .arcAltitude(0.1)
+        .arcStroke(0.8) // Thicker lines
+        .arcDashLength(0.4) // Longer dashes
+        .arcDashGap(0.15) // Smaller gaps
+        .arcDashAnimateTime(2500) // Faster animation
+        .arcAltitude(0.15) // Higher arc
         .arcLabel(d => `
             <div style="
-                background: rgba(244, 232, 208, 0.95);
-                padding: 8px 12px;
-                border-radius: 8px;
-                border: 2px solid #8b6914;
+                background: linear-gradient(135deg, rgba(244, 232, 208, 0.98), rgba(232, 220, 192, 0.98));
+                padding: 12px 16px;
+                border-radius: 12px;
+                border: 3px solid #8b6914;
                 font-family: 'Patrick Hand', cursive;
                 color: #2d2d2d;
-                font-size: 14px;
-                box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+                max-width: 250px;
+                backdrop-filter: blur(10px);
             ">
-                <strong>${d.name}</strong>
+                <div style="
+                    font-family: 'Cinzel', serif;
+                    font-weight: bold;
+                    font-size: 16px;
+                    margin-bottom: 6px;
+                    color: #8b6914;
+                ">
+                    🛤️ ${d.name}
+                </div>
+                <div style="font-size: 13px; line-height: 1.5; opacity: 0.9;">
+                    ${d.description}
+                </div>
             </div>
         `);
 }
@@ -184,57 +197,106 @@ function showSiteInfo(site) {
     const panel = document.getElementById('infoPanel');
     const content = document.getElementById('infoPanelContent');
 
+    // Default image if none provided
+    const imageUrl = site.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80';
+
     content.innerHTML = `
         <div class="info-header">
+            ${site.image ? `
+                <div style="
+                    width: 100%;
+                    height: 180px;
+                    overflow: hidden;
+                    border-radius: 15px;
+                    margin-bottom: 12px;
+                    border: 3px solid #8b6914;
+                    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                ">
+                    <img src="${imageUrl}" alt="${site.name}" style="
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    " onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80'">
+                </div>
+            ` : ''}
             <div class="site-icon">${site.icon || '🏛️'}</div>
             <h2 class="site-name">${site.name}</h2>
             <div class="site-period">${site.civilization} • ${site.founded}</div>
         </div>
         <div class="info-content">
-            <div class="info-card">
-                <div class="info-icon">📍</div>
-                <div class="info-details">
-                    <div class="info-label">Location</div>
-                    <div class="info-value">${site.lat.toFixed(2)}°N, ${site.lng.toFixed(2)}°E</div>
+            <!-- Main Description -->
+            <div style="
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: 15px;
+                border: 2px solid #8b6914;
+                line-height: 1.6;
+                margin-bottom: 8px;
+            ">
+                <div style="font-size: 14px; color: #2d2d2d;">
+                    ${site.description}
                 </div>
             </div>
 
-            <div class="info-card">
-                <div class="info-icon">🏺</div>
-                <div class="info-details">
-                    <div class="info-label">Type</div>
-                    <div class="info-value">${site.type}</div>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <div class="info-icon">⏳</div>
-                <div class="info-details">
-                    <div class="info-label">Period</div>
-                    <div class="info-value">${getPeriodName(site.period)}</div>
-                </div>
-            </div>
-
-            ${site.unesco ? `
-                <div class="info-card" style="background: rgba(212, 175, 55, 0.2);">
-                    <div class="info-icon">🏆</div>
+            ${site.significance ? `
+                <div class="info-card" style="background: rgba(212, 175, 55, 0.15);">
+                    <div class="info-icon">⭐</div>
                     <div class="info-details">
-                        <div class="info-label">UNESCO</div>
-                        <div class="info-value">World Heritage Site</div>
+                        <div class="info-label">Significance</div>
+                        <div style="font-size: 13px; line-height: 1.5; color: #2d2d2d;">
+                            ${site.significance}
+                        </div>
                     </div>
                 </div>
             ` : ''}
 
-            <div style="
-                margin-top: 12px;
-                padding: 12px;
-                background: rgba(255, 255, 255, 0.5);
-                border-radius: 20px;
-                border: 2px solid #8b6914;
-                line-height: 1.6;
-            ">
-                <div class="info-text">${site.description}</div>
+            ${site.discovery ? `
+                <div class="info-card">
+                    <div class="info-icon">🔍</div>
+                    <div class="info-details">
+                        <div class="info-label">Discovery</div>
+                        <div style="font-size: 13px; line-height: 1.5; color: #2d2d2d;">
+                            ${site.discovery}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="info-card">
+                <div class="info-icon">🏺</div>
+                <div class="info-details">
+                    <div class="info-label">Type & Period</div>
+                    <div class="info-value">${site.type} • ${getPeriodName(site.period)}</div>
+                </div>
             </div>
+
+            <div class="info-card">
+                <div class="info-icon">📍</div>
+                <div class="info-details">
+                    <div class="info-label">Coordinates</div>
+                    <div class="info-value">${site.lat.toFixed(4)}°, ${site.lng.toFixed(4)}°</div>
+                </div>
+            </div>
+
+            ${site.visitors ? `
+                <div class="info-card" style="background: rgba(16, 185, 129, 0.1);">
+                    <div class="info-icon">👥</div>
+                    <div class="info-details">
+                        <div class="info-label">Annual Visitors</div>
+                        <div class="info-value">${site.visitors}</div>
+                    </div>
+                </div>
+            ` : ''}
+
+            ${site.unesco ? `
+                <div class="info-card" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(205, 127, 50, 0.2));">
+                    <div class="info-icon">🏆</div>
+                    <div class="info-details">
+                        <div class="info-label">UNESCO</div>
+                        <div class="info-value" style="color: #d4af37;">World Heritage Site</div>
+                    </div>
+                </div>
+            ` : ''}
         </div>
     `;
 

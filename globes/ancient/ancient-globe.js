@@ -19,11 +19,14 @@ function initGlobe() {
     // Set initial view
     globe.pointOfView({ altitude: 2.5 });
 
-    // Add ancient sites as 3D objects
-    addAncientSites3D();
+    // Wait a frame for THREE to be available, then add content
+    setTimeout(() => {
+        // Add ancient sites as 3D objects
+        addAncientSites3D();
 
-    // Add trade routes
-    addTradeRoutes();
+        // Add trade routes
+        addTradeRoutes();
+    }, 100);
 
     // Enable auto-rotation
     globe.controls().autoRotate = true;
@@ -42,13 +45,11 @@ function initGlobe() {
 }
 
 // Create 3D monument objects
-function create3DMonument(site) {
-    if (!window.THREE) {
-        console.error('THREE.js not loaded');
-        return new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3));
+function create3DMonument(site, THREE) {
+    if (!THREE) {
+        console.error('THREE.js not available');
+        return null;
     }
-
-    const THREE = window.THREE;
 
     // Period-based colors
     const colorMap = {
@@ -146,42 +147,104 @@ function create3DMonument(site) {
     return monument;
 }
 
+// Add simple fallback markers if 3D doesn't work
+function addSimpleMarkers() {
+    globe.pointsData(ancientSites)
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor(d => {
+            const colors = {
+                ancient: '#cd7f32',
+                classical: '#b87333',
+                medieval: '#8b6914'
+            };
+            return colors[d.period] || colors.ancient;
+        })
+        .pointAltitude(0.01)
+        .pointRadius(0.15)
+        .pointLabel(d => `
+            <div style="
+                background: rgba(244, 232, 208, 0.95);
+                padding: 10px 14px;
+                border-radius: 12px;
+                border: 2px solid #8b6914;
+                font-family: 'Patrick Hand', cursive;
+                color: #2d2d2d;
+                box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                max-width: 220px;
+            ">
+                <div style="font-family: 'Cinzel', serif; font-weight: bold; font-size: 16px; margin-bottom: 4px;">
+                    ${d.icon} ${d.name}
+                </div>
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">
+                    ${d.civilization}
+                </div>
+                <div style="font-size: 11px; color: #8b6914;">
+                    Founded: ${d.founded}
+                </div>
+                ${d.unesco ? '<div style="margin-top: 6px; font-size: 11px; color: #d4af37;">🏆 UNESCO</div>' : ''}
+            </div>
+        `)
+        .onPointClick((d) => {
+            showSiteInfo(d);
+            selectedSite = d.name;
+            globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.5 }, 1000);
+        });
+}
+
 // Add ancient sites as 3D objects
 function addAncientSites3D() {
     const THREE = window.THREE;
-    let hoveredObj = null;
+
+    if (!THREE || !THREE.BoxGeometry) {
+        console.warn('THREE.js not fully loaded, using simple markers instead');
+        addSimpleMarkers();
+        return;
+    }
+
+    console.log(`Adding ${ancientSites.length} ancient sites as 3D objects`);
 
     globe.objectsData(ancientSites)
         .objectLat('lat')
         .objectLng('lng')
         .objectAltitude(0.01)
         .objectThreeObject(d => {
-            const monument = create3DMonument(d);
+            try {
+                const monument = create3DMonument(d, THREE);
 
-            // Add subtle glow effect around monument
-            const glowGeometry = new THREE.SphereGeometry(0.45, 16, 16);
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: 0xd4af37,
-                transparent: true,
-                opacity: 0.2,
-                side: THREE.BackSide
-            });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                if (!monument) {
+                    console.error(`Failed to create monument for ${d.name}`);
+                    return null;
+                }
 
-            const group = new THREE.Group();
-            group.add(monument);
-            group.add(glow);
+                // Add subtle glow effect around monument
+                const glowGeometry = new THREE.SphereGeometry(0.45, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xd4af37,
+                    transparent: true,
+                    opacity: 0.2,
+                    side: THREE.BackSide
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
 
-            // Store references
-            group.userData = {
-                site: d,
-                monument,
-                glow,
-                defaultScale: 1,
-                glowDefaultOpacity: 0.2
-            };
+                const group = new THREE.Group();
+                group.add(monument);
+                group.add(glow);
 
-            return group;
+                // Store references
+                group.userData = {
+                    site: d,
+                    monument,
+                    glow,
+                    defaultScale: 1,
+                    glowDefaultOpacity: 0.2
+                };
+
+                return group;
+            } catch (error) {
+                console.error(`Error creating monument for ${d.name}:`, error);
+                return null;
+            }
         })
         .objectLabel(d => `
             <div style="

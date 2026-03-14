@@ -19,14 +19,11 @@ function initGlobe() {
     // Set initial view
     globe.pointOfView({ altitude: 2.5 });
 
-    // Wait a frame for THREE to be available, then add content
-    setTimeout(() => {
-        // Add ancient sites as 3D objects
-        addAncientSites3D();
+    // Add ancient sites as markers
+    addAncientSites();
 
-        // Add trade routes
-        addTradeRoutes();
-    }, 100);
+    // Add trade routes
+    addTradeRoutes();
 
     // Enable auto-rotation
     globe.controls().autoRotate = true;
@@ -44,261 +41,101 @@ function initGlobe() {
     }, 1500);
 }
 
-// Create 3D monument objects
-function create3DMonument(site, THREE) {
-    if (!THREE) {
-        console.error('THREE.js not available');
-        return null;
-    }
+// Add ancient sites as glowing markers
+function addAncientSites() {
+    console.log(`Adding ${ancientSites.length} ancient sites`);
 
-    // Period-based colors
-    const colorMap = {
-        ancient: 0xcd7f32,    // Bronze
-        classical: 0xb87333,  // Copper
-        medieval: 0x8b6914    // Dark goldenrod
-    };
-
-    const color = colorMap[site.period] || colorMap.ancient;
-    const name = site.name.toLowerCase();
-    const type = (site.type || '').toLowerCase();
-
-    // Material for all monuments
-    const material = new THREE.MeshLambertMaterial({
-        color: color,
-        emissive: 0x8b6914,
-        emissiveIntensity: 0.3
-    });
-
-    let monument;
-
-    // Create appropriate geometry based on monument type
-    if (name.includes('pyramid') || name.includes('giza')) {
-        // Pyramid shape (4-sided cone)
-        const geometry = new THREE.ConeGeometry(0.35, 0.7, 4);
-        monument = new THREE.Mesh(geometry, material);
-        monument.rotation.y = Math.PI / 4; // Align faces
-    }
-    else if (name.includes('wall') || name.includes('great wall')) {
-        // Wall segment (elongated box)
-        const geometry = new THREE.BoxGeometry(0.8, 0.25, 0.15);
-        monument = new THREE.Mesh(geometry, material);
-    }
-    else if (name.includes('colosseum') || name.includes('amphitheatre')) {
-        // Circular arena
-        const geometry = new THREE.CylinderGeometry(0.35, 0.4, 0.4, 16, 1, true);
-        monument = new THREE.Mesh(geometry, material);
-    }
-    else if (name.includes('temple') || name.includes('angkor') || name.includes('borobudur') || name.includes('parthenon')) {
-        // Temple with stepped levels (ziggurat style)
-        monument = new THREE.Group();
-
-        const baseMat = material.clone();
-        const midMat = material.clone();
-        const topMat = material.clone();
-
-        const base = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.5), baseMat);
-        const mid = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.15, 0.35), midMat);
-        const top = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.25, 0.2), topMat);
-
-        base.position.y = 0.075;
-        mid.position.y = 0.225;
-        top.position.y = 0.425;
-
-        monument.add(base);
-        monument.add(mid);
-        monument.add(top);
-    }
-    else if (name.includes('stone') || name.includes('henge')) {
-        // Standing stone pillar
-        const geometry = new THREE.CylinderGeometry(0.08, 0.1, 0.6, 8);
-        monument = new THREE.Mesh(geometry, material);
-    }
-    else if (name.includes('petra') || type.includes('sanctuary')) {
-        // Carved facade (flat with some depth)
-        const geometry = new THREE.BoxGeometry(0.4, 0.6, 0.15);
-        monument = new THREE.Mesh(geometry, material);
-    }
-    else if (type.includes('city')) {
-        // City - cluster of 3 buildings
-        monument = new THREE.Group();
-
-        const heights = [0.4, 0.5, 0.35];
-        const positions = [
-            { x: -0.15, z: 0 },
-            { x: 0.15, z: 0.1 },
-            { x: 0, z: -0.15 }
-        ];
-
-        for (let i = 0; i < 3; i++) {
-            const building = new THREE.BoxGeometry(0.15, heights[i], 0.15);
-            const mesh = new THREE.Mesh(building, material.clone());
-            mesh.position.x = positions[i].x;
-            mesh.position.z = positions[i].z;
-            mesh.position.y = heights[i] / 2;
-            monument.add(mesh);
-        }
-    }
-    else {
-        // Default: simple monument obelisk
-        const geometry = new THREE.CylinderGeometry(0.1, 0.15, 0.5, 6);
-        monument = new THREE.Mesh(geometry, material);
-    }
-
-    return monument;
-}
-
-// Add simple fallback markers if 3D doesn't work
-function addSimpleMarkers() {
     globe.pointsData(ancientSites)
         .pointLat('lat')
         .pointLng('lng')
         .pointColor(d => {
+            // Period-based colors with glow
             const colors = {
-                ancient: '#cd7f32',
-                classical: '#b87333',
-                medieval: '#8b6914'
+                ancient: '#cd7f32',    // Bronze
+                classical: '#b87333',  // Copper
+                medieval: '#d4af37'    // Gold
             };
             return colors[d.period] || colors.ancient;
         })
         .pointAltitude(0.01)
-        .pointRadius(0.15)
+        .pointRadius(d => {
+            // UNESCO sites are slightly larger
+            return d.unesco ? 0.25 : 0.2;
+        })
+        .pointResolution(12) // Smooth circles
         .pointLabel(d => `
             <div style="
-                background: rgba(244, 232, 208, 0.95);
-                padding: 10px 14px;
-                border-radius: 12px;
-                border: 2px solid #8b6914;
+                background: linear-gradient(135deg, rgba(244, 232, 208, 0.98), rgba(232, 220, 192, 0.98));
+                padding: 12px 16px;
+                border-radius: 16px;
+                border: 3px solid #8b6914;
                 font-family: 'Patrick Hand', cursive;
                 color: #2d2d2d;
-                box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
-                max-width: 220px;
+                box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+                max-width: 250px;
+                backdrop-filter: blur(10px);
             ">
-                <div style="font-family: 'Cinzel', serif; font-weight: bold; font-size: 16px; margin-bottom: 4px;">
+                <div style="
+                    font-family: 'Cinzel', serif;
+                    font-weight: bold;
+                    font-size: 18px;
+                    margin-bottom: 6px;
+                    color: #8b6914;
+                ">
                     ${d.icon} ${d.name}
                 </div>
-                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">
+                <div style="
+                    font-size: 13px;
+                    opacity: 0.9;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                ">
                     ${d.civilization}
                 </div>
-                <div style="font-size: 11px; color: #8b6914;">
+                <div style="
+                    font-size: 12px;
+                    color: #8b6914;
+                    background: rgba(212, 175, 55, 0.2);
+                    padding: 4px 8px;
+                    border-radius: 8px;
+                    display: inline-block;
+                    margin-bottom: 4px;
+                ">
                     Founded: ${d.founded}
                 </div>
-                ${d.unesco ? '<div style="margin-top: 6px; font-size: 11px; color: #d4af37;">🏆 UNESCO</div>' : ''}
+                <div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">
+                    ${d.type} • ${d.period.charAt(0).toUpperCase() + d.period.slice(1)} Period
+                </div>
+                ${d.unesco ? `
+                    <div style="
+                        margin-top: 8px;
+                        font-size: 12px;
+                        color: #d4af37;
+                        background: rgba(212, 175, 55, 0.15);
+                        padding: 4px 8px;
+                        border-radius: 8px;
+                        border: 1px solid #d4af37;
+                        display: inline-block;
+                    ">
+                        🏆 UNESCO World Heritage Site
+                    </div>
+                ` : ''}
             </div>
         `)
         .onPointClick((d) => {
             showSiteInfo(d);
             selectedSite = d.name;
-            globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.5 }, 1000);
-        });
-}
 
-// Add ancient sites as 3D objects
-function addAncientSites3D() {
-    const THREE = window.THREE;
-
-    if (!THREE || !THREE.BoxGeometry) {
-        console.warn('THREE.js not fully loaded, using simple markers instead');
-        addSimpleMarkers();
-        return;
-    }
-
-    console.log(`Adding ${ancientSites.length} ancient sites as 3D objects`);
-
-    globe.objectsData(ancientSites)
-        .objectLat('lat')
-        .objectLng('lng')
-        .objectAltitude(0.01)
-        .objectThreeObject(d => {
-            try {
-                const monument = create3DMonument(d, THREE);
-
-                if (!monument) {
-                    console.error(`Failed to create monument for ${d.name}`);
-                    return null;
-                }
-
-                // Add subtle glow effect around monument
-                const glowGeometry = new THREE.SphereGeometry(0.45, 16, 16);
-                const glowMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xd4af37,
-                    transparent: true,
-                    opacity: 0.2,
-                    side: THREE.BackSide
-                });
-                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-
-                const group = new THREE.Group();
-                group.add(monument);
-                group.add(glow);
-
-                // Store references
-                group.userData = {
-                    site: d,
-                    monument,
-                    glow,
-                    defaultScale: 1,
-                    glowDefaultOpacity: 0.2
-                };
-
-                return group;
-            } catch (error) {
-                console.error(`Error creating monument for ${d.name}:`, error);
-                return null;
-            }
-        })
-        .objectLabel(d => `
-            <div style="
-                background: rgba(244, 232, 208, 0.95);
-                padding: 10px 14px;
-                border-radius: 12px;
-                border: 2px solid #8b6914;
-                font-family: 'Patrick Hand', cursive;
-                color: #2d2d2d;
-                box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
-                max-width: 220px;
-            ">
-                <div style="font-family: 'Cinzel', serif; font-weight: bold; font-size: 16px; margin-bottom: 4px;">
-                    ${d.icon} ${d.name}
-                </div>
-                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">
-                    ${d.civilization}
-                </div>
-                <div style="font-size: 11px; color: #8b6914;">
-                    Founded: ${d.founded}
-                </div>
-                ${d.unesco ? '<div style="margin-top: 6px; font-size: 11px; color: #d4af37;">🏆 UNESCO World Heritage</div>' : ''}
-            </div>
-        `)
-        .onObjectClick((d, event, { object }) => {
-            showSiteInfo(d);
-            selectedSite = d.name;
-
-            // Zoom to site
+            // Zoom to site with smooth animation
             globe.pointOfView({
                 lat: d.lat,
                 lng: d.lng,
                 altitude: 1.5
             }, 1000);
         })
-        .onObjectHover((d, prevD, { object, prevObject }) => {
-            // Update cursor
+        .onPointHover(d => {
+            // Change cursor on hover
             document.body.style.cursor = d ? 'pointer' : 'default';
-
-            // Reset previous hovered object
-            if (prevObject && prevObject.userData) {
-                prevObject.scale.set(1, 1, 1);
-                if (prevObject.userData.glow) {
-                    prevObject.userData.glow.material.opacity = 0.2;
-                }
-            }
-
-            // Scale up current hovered object
-            if (object && object.userData) {
-                object.scale.set(1.4, 1.4, 1.4);
-                if (object.userData.glow) {
-                    object.userData.glow.material.opacity = 0.6;
-                }
-            }
         });
 }
 
@@ -419,10 +256,10 @@ function filterByPeriod(period) {
     currentFilter = period;
 
     if (period === 'all') {
-        globe.objectsData(ancientSites);
+        globe.pointsData(ancientSites);
     } else {
         const filtered = ancientSites.filter(site => site.period === period);
-        globe.objectsData(filtered);
+        globe.pointsData(filtered);
     }
 
     // Update legend active state

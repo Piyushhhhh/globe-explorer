@@ -48,16 +48,17 @@ function addAncientSites() {
     globe.htmlElementsData(ancientSites)
         .htmlLat('lat')
         .htmlLng('lng')
-        .htmlAltitude(0.01)
+        .htmlAltitude(0)
+        .htmlTransitionDuration(0) // Disable transitions to prevent floating
         .htmlElement(d => {
             const el = document.createElement('div');
             el.style.cssText = `
                 width: 40px;
                 height: 40px;
                 cursor: pointer;
-                position: relative;
-                transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
                 pointer-events: auto;
+                transform: translate(-50%, -50%);
+                will-change: transform;
             `;
 
             // Create marker image or fallback to colored circle
@@ -74,11 +75,11 @@ function addAncientSites() {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        transition: all 0.3s ease;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
                     ">
                         <img src="${d.markerImage}"
-                             style="width: 100%; height: 100%; object-fit: contain;"
-                             onerror="this.parentElement.innerHTML='${d.icon}'">
+                             style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;"
+                             onerror="this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='20px';">
                     </div>
                     ${d.unesco ? `
                         <div style="
@@ -87,6 +88,7 @@ function addAncientSites() {
                             right: -8px;
                             font-size: 16px;
                             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                            pointer-events: none;
                         ">🏆</div>
                     ` : ''}
                 `;
@@ -111,26 +113,32 @@ function addAncientSites() {
                         font-size: 20px;
                         box-shadow: 0 4px 12px ${color}80;
                         border: 3px solid white;
-                        transition: all 0.3s ease;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        pointer-events: none;
                     ">${d.icon}</div>
                 `;
             }
 
             // Hover effects
             el.addEventListener('mouseenter', () => {
-                el.style.transform = 'scale(1.4)';
                 const inner = el.querySelector('div');
                 if (inner) {
+                    inner.style.transform = 'scale(1.3)';
                     inner.style.boxShadow = '0 8px 24px rgba(212, 175, 55, 1)';
                 }
             });
 
             el.addEventListener('mouseleave', () => {
                 if (selectedSite !== d.name) {
-                    el.style.transform = 'scale(1)';
                     const inner = el.querySelector('div');
-                    if (inner && d.markerImage) {
-                        inner.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.6)';
+                    if (inner) {
+                        inner.style.transform = 'scale(1)';
+                        if (d.markerImage) {
+                            inner.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.6)';
+                        } else {
+                            const color = d.period === 'ancient' ? '#cd7f32' : d.period === 'classical' ? '#b87333' : '#d4af37';
+                            inner.style.boxShadow = `0 4px 12px ${color}80`;
+                        }
                     }
                 }
             });

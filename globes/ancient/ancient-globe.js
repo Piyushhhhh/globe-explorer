@@ -41,68 +41,75 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites with image markers
+// Add ancient sites with clean minimal markers
 function addAncientSites() {
-    console.log(`Adding ${ancientSites.length} ancient sites with image markers`);
+    console.log(`Adding ${ancientSites.length} ancient sites with clean markers`);
 
     globe.htmlElementsData(ancientSites)
         .htmlLat('lat')
         .htmlLng('lng')
         .htmlAltitude(0)
-        .htmlTransitionDuration(0) // Disable transitions to prevent floating
+        .htmlTransitionDuration(0)
         .htmlElement(d => {
             const el = document.createElement('div');
             el.style.cssText = `
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
                 cursor: pointer;
                 pointer-events: auto;
                 transform: translate(-50%, -50%);
                 will-change: transform;
+                position: relative;
             `;
 
-            // Create marker image or fallback to colored circle
+            // Period-based colors
+            const colors = {
+                ancient: '#cd7f32',
+                classical: '#b87333',
+                medieval: '#d4af37'
+            };
+            const color = colors[d.period] || colors.ancient;
+
+            // Create clean marker with icon
             if (d.markerImage) {
                 el.innerHTML = `
-                    <div style="
+                    <div class="monument-marker" style="
                         width: 100%;
                         height: 100%;
-                        background: white;
+                        background: rgba(0, 0, 0, 0.7);
+                        backdrop-filter: blur(8px);
                         border-radius: 50%;
-                        padding: 6px;
-                        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.6);
-                        border: 3px solid #d4af37;
+                        padding: 7px;
+                        box-shadow:
+                            0 0 0 2px ${color},
+                            0 0 20px ${color}60,
+                            0 4px 12px rgba(0, 0, 0, 0.3);
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                        pointer-events: none;
                     ">
                         <img src="${d.markerImage}"
-                             style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;"
-                             onerror="this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='20px';">
+                             style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 4px ${color}); pointer-events: none;"
+                             onerror="this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='18px'; this.parentElement.style.color='${color}';">
                     </div>
                     ${d.unesco ? `
                         <div style="
                             position: absolute;
-                            top: -8px;
-                            right: -8px;
-                            font-size: 16px;
-                            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                            top: -6px;
+                            right: -6px;
+                            font-size: 14px;
+                            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
                             pointer-events: none;
+                            animation: float 3s ease-in-out infinite;
                         ">🏆</div>
                     ` : ''}
                 `;
             } else {
-                // Fallback to styled dot with icon
-                const colors = {
-                    ancient: '#cd7f32',
-                    classical: '#b87333',
-                    medieval: '#d4af37'
-                };
-                const color = colors[d.period] || colors.ancient;
-
+                // Fallback to simple glowing dot
                 el.innerHTML = `
-                    <div style="
+                    <div class="monument-marker" style="
                         width: 100%;
                         height: 100%;
                         background: ${color};
@@ -110,10 +117,12 @@ function addAncientSites() {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 20px;
-                        box-shadow: 0 4px 12px ${color}80;
-                        border: 3px solid white;
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        font-size: 18px;
+                        box-shadow:
+                            0 0 0 2px rgba(255, 255, 255, 0.8),
+                            0 0 20px ${color},
+                            0 4px 12px rgba(0, 0, 0, 0.3);
+                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
                         pointer-events: none;
                     ">${d.icon}</div>
                 `;
@@ -121,23 +130,34 @@ function addAncientSites() {
 
             // Hover effects
             el.addEventListener('mouseenter', () => {
-                const inner = el.querySelector('div');
-                if (inner) {
-                    inner.style.transform = 'scale(1.3)';
-                    inner.style.boxShadow = '0 8px 24px rgba(212, 175, 55, 1)';
+                const marker = el.querySelector('.monument-marker');
+                if (marker) {
+                    marker.style.transform = 'scale(1.4)';
+                    marker.style.boxShadow = `
+                        0 0 0 3px ${color},
+                        0 0 40px ${color}cc,
+                        0 8px 24px rgba(0, 0, 0, 0.4)
+                    `;
                 }
             });
 
             el.addEventListener('mouseleave', () => {
                 if (selectedSite !== d.name) {
-                    const inner = el.querySelector('div');
-                    if (inner) {
-                        inner.style.transform = 'scale(1)';
+                    const marker = el.querySelector('.monument-marker');
+                    if (marker) {
+                        marker.style.transform = 'scale(1)';
                         if (d.markerImage) {
-                            inner.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.6)';
+                            marker.style.boxShadow = `
+                                0 0 0 2px ${color},
+                                0 0 20px ${color}60,
+                                0 4px 12px rgba(0, 0, 0, 0.3)
+                            `;
                         } else {
-                            const color = d.period === 'ancient' ? '#cd7f32' : d.period === 'classical' ? '#b87333' : '#d4af37';
-                            inner.style.boxShadow = `0 4px 12px ${color}80`;
+                            marker.style.boxShadow = `
+                                0 0 0 2px rgba(255, 255, 255, 0.8),
+                                0 0 20px ${color},
+                                0 4px 12px rgba(0, 0, 0, 0.3)
+                            `;
                         }
                     }
                 }
@@ -149,7 +169,6 @@ function addAncientSites() {
                 showSiteInfo(d);
                 selectedSite = d.name;
 
-                // Zoom to site
                 globe.pointOfView({
                     lat: d.lat,
                     lng: d.lng,
@@ -159,6 +178,16 @@ function addAncientSites() {
 
             return el;
         });
+
+    // Add floating animation for UNESCO badges
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Show route information panel

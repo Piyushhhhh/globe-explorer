@@ -3,6 +3,7 @@
 let globe;
 let selectedSite = null;
 let currentFilter = 'all';
+let currentHoveredMarker = null;
 
 // Initialize the globe
 function initGlobe() {
@@ -41,9 +42,9 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites with ultra-minimal professional markers
+// Add ancient sites with prominent icon markers
 function addAncientSites() {
-    console.log(`Adding ${ancientSites.length} ancient sites with minimal markers`);
+    console.log(`Adding ${ancientSites.length} ancient sites with icon markers`);
 
     globe.htmlElementsData(ancientSites)
         .htmlLat('lat')
@@ -53,15 +54,11 @@ function addAncientSites() {
         .htmlElement(d => {
             const el = document.createElement('div');
             el.style.cssText = `
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
                 cursor: pointer;
                 pointer-events: auto;
-                transform: translate(-50%, -50%);
-                will-change: transform;
                 position: relative;
-                opacity: 0.7;
-                transition: opacity 0.3s ease;
             `;
 
             // Period-based colors
@@ -72,82 +69,129 @@ function addAncientSites() {
             };
             const color = colors[d.period] || colors.ancient;
 
-            // Minimal marker with icon
+            // Prominent marker with icon
             if (d.markerImage) {
                 el.innerHTML = `
                     <div class="monument-marker" style="
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0, 0, 0, 0.5);
+                        width: 18px;
+                        height: 18px;
+                        background: rgba(0, 0, 0, 0.85);
                         border-radius: 50%;
-                        padding: 4px;
+                        border: 2px solid ${color};
                         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: all 0.25s ease;
+                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
                         pointer-events: none;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        overflow: hidden;
+                        padding: 2px;
                     ">
                         <img src="${d.markerImage}"
-                             style="width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.9;"
-                             onerror="this.parentElement.style.background='${color}'; this.parentElement.innerHTML='${d.icon}'; this.parentElement.style.fontSize='11px';">
+                             style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;"
+                             onerror="this.style.display='none'; const parent = this.parentElement; parent.style.background='${color}'; parent.style.padding='0'; parent.innerHTML='<div style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;line-height:0;&quot;>${d.icon}</div>';">
                     </div>
                     ${d.unesco ? `
                         <div class="unesco-badge" style="
                             position: absolute;
-                            top: -4px;
-                            right: -4px;
-                            font-size: 10px;
+                            top: -3px;
+                            right: -3px;
+                            font-size: 8px;
                             opacity: 0;
-                            transition: opacity 0.25s ease;
+                            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
                             pointer-events: none;
+                            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+                            z-index: 10;
                         ">🏆</div>
                     ` : ''}
                 `;
             } else {
-                // Fallback to simple dot
+                // Fallback to colored icon
                 el.innerHTML = `
                     <div class="monument-marker" style="
-                        width: 100%;
-                        height: 100%;
+                        width: 18px;
+                        height: 18px;
                         background: ${color};
                         border-radius: 50%;
+                        border: 2px solid rgba(255, 255, 255, 0.9);
                         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                        transition: all 0.25s ease;
+                        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
                         pointer-events: none;
-                    "></div>
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        overflow: hidden;
+                    ">
+                        <div style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            font-size: 9px;
+                            line-height: 0;
+                        ">${d.icon}</div>
+                    </div>
                 `;
             }
 
-            // Hover effects
+            // Hover effects with dramatic scale and bounce
             el.addEventListener('mouseenter', () => {
-                el.style.opacity = '1';
+                // Reset previous hovered marker
+                if (currentHoveredMarker && currentHoveredMarker !== el) {
+                    const prevMarker = currentHoveredMarker.querySelector('.monument-marker');
+                    const prevBadge = currentHoveredMarker.querySelector('.unesco-badge');
+
+                    if (prevMarker) {
+                        prevMarker.style.transform = 'translate(-50%, -50%) scale(1)';
+                        prevMarker.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+                        prevMarker.style.zIndex = '1';
+                    }
+
+                    if (prevBadge) {
+                        prevBadge.style.opacity = '0';
+                        prevBadge.style.transform = 'scale(1)';
+                    }
+                }
+
+                // Set current marker as hovered
+                currentHoveredMarker = el;
+
                 const marker = el.querySelector('.monument-marker');
                 const badge = el.querySelector('.unesco-badge');
 
                 if (marker) {
-                    marker.style.transform = 'scale(2)';
-                    marker.style.boxShadow = `0 0 0 2px ${color}, 0 4px 12px rgba(0, 0, 0, 0.4)`;
+                    marker.style.transform = 'translate(-50%, -50%) scale(2.4)';
+                    marker.style.boxShadow = `0 0 0 4px ${color}, 0 8px 24px rgba(0, 0, 0, 0.6)`;
+                    marker.style.zIndex = '1000';
                 }
 
                 if (badge) {
                     badge.style.opacity = '1';
+                    badge.style.transform = 'scale(1.3)';
                 }
             });
 
             el.addEventListener('mouseleave', () => {
                 if (selectedSite !== d.name) {
-                    el.style.opacity = '0.7';
                     const marker = el.querySelector('.monument-marker');
                     const badge = el.querySelector('.unesco-badge');
 
                     if (marker) {
-                        marker.style.transform = 'scale(1)';
+                        marker.style.transform = 'translate(-50%, -50%) scale(1)';
                         marker.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+                        marker.style.zIndex = '1';
                     }
 
                     if (badge) {
                         badge.style.opacity = '0';
+                        badge.style.transform = 'scale(1)';
+                    }
+
+                    // Clear current hovered marker if it's this element
+                    if (currentHoveredMarker === el) {
+                        currentHoveredMarker = null;
                     }
                 }
             });

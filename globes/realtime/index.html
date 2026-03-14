@@ -47,24 +47,69 @@
                     <button id="toggleNightLights" class="btn-secondary">City Lights</button>
                 </div>
 
+                <!-- Live Stats Panel -->
+                <div class="live-stats-panel">
+                    <h4>Live Data</h4>
+
+                    <div class="stat-row">
+                        <div class="stat-mini">
+                            <span class="stat-mini-icon">🛰️</span>
+                            <div class="stat-mini-content">
+                                <div class="stat-mini-value" id="issAltitude">408 km</div>
+                                <div class="stat-mini-label">ISS Altitude</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row">
+                        <div class="stat-mini">
+                            <span class="stat-mini-icon">⚡</span>
+                            <div class="stat-mini-content">
+                                <div class="stat-mini-value" id="issSpeed">27,600 km/h</div>
+                                <div class="stat-mini-label">ISS Speed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row">
+                        <div class="stat-mini">
+                            <span class="stat-mini-icon">🔴</span>
+                            <div class="stat-mini-content">
+                                <div class="stat-mini-value" id="earthquakeCount">--</div>
+                                <div class="stat-mini-label">Earthquakes Today</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-row">
+                        <div class="stat-mini">
+                            <span class="stat-mini-icon">🌍</span>
+                            <div class="stat-mini-content">
+                                <div class="stat-mini-value" id="dayNightRatio">50/50</div>
+                                <div class="stat-mini-label">Day/Night Split</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Legend -->
                 <div class="legend">
-                    <h4>What's Happening Now</h4>
+                    <h4>Key</h4>
                     <div class="legend-item">
                         <span class="legend-icon">🛰️</span>
-                        <span>ISS Location</span>
+                        <span>ISS</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-icon">🔴</span>
-                        <span>Earthquakes (24h)</span>
+                        <span>Earthquakes</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-icon">🌙</span>
-                        <span>Night Side</span>
+                        <span>Night</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-icon">☀️</span>
-                        <span>Day Side</span>
+                        <span>Day</span>
                     </div>
                 </div>
             </div>
@@ -114,36 +159,6 @@
             </div>
         </div>
 
-        <!-- Live Stats Footer -->
-        <footer class="stats-footer">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🛰️</div>
-                    <div class="stat-value" id="issAltitude">408 km</div>
-                    <div class="stat-label">ISS Altitude</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⚡</div>
-                    <div class="stat-value" id="issSpeed">27,600 km/h</div>
-                    <div class="stat-label">ISS Speed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔴</div>
-                    <div class="stat-value" id="earthquakeCount">--</div>
-                    <div class="stat-label">Earthquakes Today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🌍</div>
-                    <div class="stat-value" id="dayNightRatio">50/50</div>
-                    <div class="stat-label">Day/Night Split</div>
-                </div>
-            </div>
-
-            <!-- Data Attribution -->
-            <div class="attribution">
-                <p>Live data from: NASA (ISS) • USGS (Earthquakes) • Astronomical calculations (Sun position)</p>
-            </div>
-        </footer>
     </div>
 
     <!-- Loading Screen -->

@@ -15,6 +15,7 @@ const ancientSites = [
         discovery: "Always known to history. Serious archaeological study began in 1800s.",
         visitors: "14 million annually",
         image: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/3124/3124492.png",
         icon: "🔺",
         unesco: true
     },
@@ -119,6 +120,7 @@ const ancientSites = [
         discovery: "Continuous occupation. Parthenon built 447-432 BCE under Pericles.",
         visitors: "7 million annually (Acropolis)",
         image: "https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2990/2990510.png",
         icon: "🏛️",
         unesco: true
     },
@@ -159,6 +161,7 @@ const ancientSites = [
         discovery: "Continuous occupation since founding. Colosseum completed 80 CE.",
         visitors: "9 million annually (Colosseum)",
         image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2990/2990527.png",
         icon: "🏛️",
         unesco: true
     },
@@ -189,6 +192,7 @@ const ancientSites = [
         discovery: "Rediscovered by Hiram Bingham in 1911, though locals always knew of it.",
         visitors: "1.5 million annually (limited permits)",
         image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2990/2990505.png",
         icon: "⛰️",
         unesco: true
     },
@@ -217,6 +221,7 @@ const ancientSites = [
         discovery: "Spanish conquistadors documented it in 1500s. Major excavations began 1924.",
         visitors: "2.6 million annually",
         image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/3124/3124495.png",
         icon: "🏛️",
         unesco: true
     },
@@ -259,6 +264,7 @@ const ancientSites = [
         discovery: "Always known. Became a symbol of Chinese resilience and engineering prowess.",
         visitors: "10 million annually",
         image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2990/2990522.png",
         icon: "🧱",
         unesco: true
     },
@@ -286,7 +292,8 @@ const ancientSites = [
         significance: "Covers 162 hectares. Built without mortar using sandstone blocks weighing up to 1.5 tons each.",
         discovery: "Never truly lost, but brought to Western attention by French explorer Henri Mouhot in 1860.",
         visitors: "2.6 million annually",
-        image: "https://images.unsplash.com/photo-1604074131665-7a4b13870ab9?w=600&q=80",
+        image: "https://cdn.pixabay.com/photo/2017/05/26/11/29/angkor-wat-2345136_1280.jpg",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/3097/3097382.png",
         icon: "🏛️",
         unesco: true
     },
@@ -341,6 +348,7 @@ const ancientSites = [
         discovery: "Introduced to Western world by Swiss explorer Johann Ludwig Burckhardt in 1812.",
         visitors: "1 million annually",
         image: "https://images.unsplash.com/photo-1578895101408-1a36b834405b?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2738/2738652.png",
         icon: "🏜️",
         unesco: true
     },
@@ -421,6 +429,7 @@ const ancientSites = [
         discovery: "Always known to locals. First detailed study by architect Inigo Jones in 1640.",
         visitors: "1.6 million annually",
         image: "https://images.unsplash.com/photo-1599833975787-5456e1b3821e?w=600&q=80",
+        markerImage: "https://cdn-icons-png.flaticon.com/128/2738/2738654.png",
         icon: "🗿",
         unesco: true
     },

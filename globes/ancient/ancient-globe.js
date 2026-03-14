@@ -41,101 +41,115 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites as glowing markers
+// Add ancient sites with image markers
 function addAncientSites() {
-    console.log(`Adding ${ancientSites.length} ancient sites`);
+    console.log(`Adding ${ancientSites.length} ancient sites with image markers`);
 
-    globe.pointsData(ancientSites)
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor(d => {
-            // Period-based colors with glow
-            const colors = {
-                ancient: '#cd7f32',    // Bronze
-                classical: '#b87333',  // Copper
-                medieval: '#d4af37'    // Gold
-            };
-            return colors[d.period] || colors.ancient;
-        })
-        .pointAltitude(0.01)
-        .pointRadius(d => {
-            // UNESCO sites are slightly larger
-            return d.unesco ? 0.25 : 0.2;
-        })
-        .pointResolution(12) // Smooth circles
-        .pointLabel(d => `
-            <div style="
-                background: linear-gradient(135deg, rgba(244, 232, 208, 0.98), rgba(232, 220, 192, 0.98));
-                padding: 12px 16px;
-                border-radius: 16px;
-                border: 3px solid #8b6914;
-                font-family: 'Patrick Hand', cursive;
-                color: #2d2d2d;
-                box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
-                max-width: 250px;
-                backdrop-filter: blur(10px);
-            ">
-                <div style="
-                    font-family: 'Cinzel', serif;
-                    font-weight: bold;
-                    font-size: 18px;
-                    margin-bottom: 6px;
-                    color: #8b6914;
-                ">
-                    ${d.icon} ${d.name}
-                </div>
-                <div style="
-                    font-size: 13px;
-                    opacity: 0.9;
-                    margin-bottom: 6px;
-                    font-weight: 500;
-                ">
-                    ${d.civilization}
-                </div>
-                <div style="
-                    font-size: 12px;
-                    color: #8b6914;
-                    background: rgba(212, 175, 55, 0.2);
-                    padding: 4px 8px;
-                    border-radius: 8px;
-                    display: inline-block;
-                    margin-bottom: 4px;
-                ">
-                    Founded: ${d.founded}
-                </div>
-                <div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">
-                    ${d.type} • ${d.period.charAt(0).toUpperCase() + d.period.slice(1)} Period
-                </div>
-                ${d.unesco ? `
+    globe.htmlElementsData(ancientSites)
+        .htmlLat('lat')
+        .htmlLng('lng')
+        .htmlAltitude(0.01)
+        .htmlElement(d => {
+            const el = document.createElement('div');
+            el.style.cssText = `
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                pointer-events: auto;
+            `;
+
+            // Create marker image or fallback to colored circle
+            if (d.markerImage) {
+                el.innerHTML = `
                     <div style="
-                        margin-top: 8px;
-                        font-size: 12px;
-                        color: #d4af37;
-                        background: rgba(212, 175, 55, 0.15);
-                        padding: 4px 8px;
-                        border-radius: 8px;
-                        border: 1px solid #d4af37;
-                        display: inline-block;
+                        width: 100%;
+                        height: 100%;
+                        background: white;
+                        border-radius: 50%;
+                        padding: 6px;
+                        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.6);
+                        border: 3px solid #d4af37;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
                     ">
-                        🏆 UNESCO World Heritage Site
+                        <img src="${d.markerImage}"
+                             style="width: 100%; height: 100%; object-fit: contain;"
+                             onerror="this.parentElement.innerHTML='${d.icon}'">
                     </div>
-                ` : ''}
-            </div>
-        `)
-        .onPointClick((d) => {
-            showSiteInfo(d);
-            selectedSite = d.name;
+                    ${d.unesco ? `
+                        <div style="
+                            position: absolute;
+                            top: -8px;
+                            right: -8px;
+                            font-size: 16px;
+                            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                        ">🏆</div>
+                    ` : ''}
+                `;
+            } else {
+                // Fallback to styled dot with icon
+                const colors = {
+                    ancient: '#cd7f32',
+                    classical: '#b87333',
+                    medieval: '#d4af37'
+                };
+                const color = colors[d.period] || colors.ancient;
 
-            // Zoom to site with smooth animation
-            globe.pointOfView({
-                lat: d.lat,
-                lng: d.lng,
-                altitude: 1.5
-            }, 1000);
-        })
-        .onPointHover(d => {
-            // Change cursor on hover
-            document.body.style.cursor = d ? 'pointer' : 'default';
+                el.innerHTML = `
+                    <div style="
+                        width: 100%;
+                        height: 100%;
+                        background: ${color};
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 20px;
+                        box-shadow: 0 4px 12px ${color}80;
+                        border: 3px solid white;
+                        transition: all 0.3s ease;
+                    ">${d.icon}</div>
+                `;
+            }
+
+            // Hover effects
+            el.addEventListener('mouseenter', () => {
+                el.style.transform = 'scale(1.4)';
+                const inner = el.querySelector('div');
+                if (inner) {
+                    inner.style.boxShadow = '0 8px 24px rgba(212, 175, 55, 1)';
+                }
+            });
+
+            el.addEventListener('mouseleave', () => {
+                if (selectedSite !== d.name) {
+                    el.style.transform = 'scale(1)';
+                    const inner = el.querySelector('div');
+                    if (inner && d.markerImage) {
+                        inner.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.6)';
+                    }
+                }
+            });
+
+            // Click handler
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showSiteInfo(d);
+                selectedSite = d.name;
+
+                // Zoom to site
+                globe.pointOfView({
+                    lat: d.lat,
+                    lng: d.lng,
+                    altitude: 1.5
+                }, 1000);
+            });
+
+            return el;
         });
 }
 
@@ -460,10 +474,10 @@ function filterByPeriod(period) {
     currentFilter = period;
 
     if (period === 'all') {
-        globe.pointsData(ancientSites);
+        globe.htmlElementsData(ancientSites);
     } else {
         const filtered = ancientSites.filter(site => site.period === period);
-        globe.pointsData(filtered);
+        globe.htmlElementsData(filtered);
     }
 
     // Update legend active state
@@ -474,6 +488,9 @@ function filterByPeriod(period) {
             item.classList.remove('active');
         }
     });
+
+    // Re-add the sites with proper rendering
+    addAncientSites();
 }
 
 // Initialize controls

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ Ancient Civilizations Globe - Lost Cities Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/globes/ancient/ancient-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>🏛️ Ancient Civilizations</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="legend">
+                    <h4>Era Filter</h4>
+                    <div class="legend-item" data-filter="all">
+                        <span class="legend-color" style="background: linear-gradient(135deg, #d4af37, #aa8c30);"></span>
+                        <span>All Sites</span>
+                    </div>
+                    <div class="legend-item" data-filter="ancient">
+                        <span class="legend-color" style="background: #cd7f32;"></span>
+                        <span>Ancient (3000 BCE - 500 CE)</span>
+                    </div>
+                    <div class="legend-item" data-filter="classical">
+                        <span class="legend-color" style="background: #b87333;"></span>
+                        <span>Classical (500 BCE - 500 CE)</span>
+                    </div>
+                    <div class="legend-item" data-filter="medieval">
+                        <span class="legend-color" style="background: #8b6914;"></span>
+                        <span>Medieval (500 - 1500 CE)</span>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 2px dashed #2d2d2d; font-size: 11px; opacity: 0.8; line-height: 1.4;">
+                        Click any ancient site to explore its history
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel hidden" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div id="infoPanelContent">
+                    <div class="info-header">
+                        <div class="site-icon">🏛️</div>
+                        <h2 class="site-name">Ancient Civilizations Globe</h2>
+                        <div class="site-period">Journey Through Time</div>
+                    </div>
+                    <div class="info-content">
+                        <div style="color: rgba(45,45,45,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                            <p style="margin-bottom: 12px;">Explore ancient cities, lost civilizations, and archaeological wonders across 5,000 years of human history.</p>
+                            <p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px;">Click on any golden marker to discover:</p>
+                            <div style="text-align: left; max-width: 280px; margin: 0 auto; font-size: 13px;">
+                                <p>🏛️ Ancient cities & ruins</p>
+                                <p>👑 Lost civilizations</p>
+                                <p>🗺️ Historic trade routes</p>
+                                <p>🏺 UNESCO World Heritage sites</p>
+                                <p>⚔️ Empire territories</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🏛️</div>
+                    <span class="stat-value" id="totalSites">150+</span>
+                    <span class="stat-label">Ancient Sites</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">👑</div>
+                    <span class="stat-value" id="oldestSite">~3000 BCE</span>
+                    <span class="stat-label">Oldest Sites</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🗺️</div>
+                    <span class="stat-value" id="tradeRoutes">8</span>
+                    <span class="stat-label">Trade Routes</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Ancient Civilizations...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="/globes/ancient/ancient-data.js"></script>
+    <script src="/globes/ancient/ancient-globe.js"></script>
+</body>
+</html>

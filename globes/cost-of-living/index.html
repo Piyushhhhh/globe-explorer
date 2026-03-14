@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💸 Cost of Living Globe - Global Affordability Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/globes/cost-of-living/cost-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="../../index.html">← Back to Globe Explorer</a>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>💸 Cost of Living Globe</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Globe Container -->
+            <div class="globe-container">
+                <div id="globe"></div>
+                <div class="controls">
+                    <button id="resetView">Reset View</button>
+                    <button id="autoRotate">Auto Rotate</button>
+                </div>
+                <div class="legend">
+                    <h4>Affordability</h4>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #10b981;"></span>
+                        <span>Very Affordable</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #22c55e;"></span>
+                        <span>Affordable</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #f59e0b;"></span>
+                        <span>Moderate</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ef4444;"></span>
+                        <span>Expensive</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #dc2626;"></span>
+                        <span>Very Expensive</span>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 2px dashed #2d2d2d; font-size: 11px; opacity: 0.8; line-height: 1.4;">
+                        Small countries (Singapore, Monaco, etc.) are marked with colored dots
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel hidden" id="infoPanel">
+                <button class="close-panel" id="closePanel">✕</button>
+                <div id="infoPanelContent">
+                    <div class="info-header">
+                        <div class="country-flag">💰</div>
+                        <h2 class="country-name">Welcome to Cost of Living Globe</h2>
+                        <div class="country-rank">Global Affordability Explorer</div>
+                    </div>
+                    <div class="info-content">
+                        <div style="color: rgba(45,45,45,0.8); text-align: center; padding: 20px; line-height: 1.8;">
+                            <p style="margin-bottom: 12px;">Click on any country to explore cost breakdowns, monthly budgets, and purchasing power.</p>
+                            <p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px;">Countries are color-coded by affordability (green = cheap, red = expensive)</p>
+                            <p style="font-size: 13px; opacity: 0.6;">Small countries like Singapore and Monaco are marked with colored dots + labels</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🌍</div>
+                    <span class="stat-value">198</span>
+                    <span class="stat-label">Countries</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💰</div>
+                    <span class="stat-value">$2,100</span>
+                    <span class="stat-label">Avg Budget</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📊</div>
+                    <span class="stat-value">0-100</span>
+                    <span class="stat-label">Cost Index</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Cost Data...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="/globes/cost-of-living/cost-data.js"></script>
+    <script src="/globes/cost-of-living/cost-globe.js"></script>
+</body>
+</html>

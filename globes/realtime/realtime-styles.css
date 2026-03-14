@@ -138,16 +138,8 @@ body::before {
 
 /* === MAIN CONTENT === */
 .main-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    position: relative;
     margin-bottom: 3rem;
-}
-
-@media (min-width: 1024px) {
-    .main-content {
-        grid-template-columns: 2fr 1fr;
-    }
 }
 
 /* === GLOBE CONTAINER === */
@@ -158,12 +150,23 @@ body::before {
     border-radius: var(--wobbly-lg);
     box-shadow: var(--shadow-lg);
     padding: 1.5rem;
-    min-height: 600px;
+    min-height: 700px;
+    width: 100%;
 }
 
 #globe {
     width: 100%;
-    height: 600px;
+    height: 700px;
+}
+
+@media (max-width: 768px) {
+    .globe-container {
+        min-height: 500px;
+    }
+
+    #globe {
+        height: 500px;
+    }
 }
 
 /* Live Status Banner */
@@ -263,6 +266,16 @@ body::before {
     box-shadow: var(--shadow-sm);
     transform: rotate(-1deg);
     max-width: 200px;
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .legend {
+        position: static;
+        margin-top: 1rem;
+        transform: rotate(0deg);
+        max-width: 100%;
+    }
 }
 
 .legend h4 {
@@ -285,14 +298,39 @@ body::before {
 
 /* === INFO PANEL (Post-it Style) === */
 .info-panel {
-    position: relative;
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 140px);
     background: var(--post-it-yellow);
     border: 3px solid var(--border);
     border-radius: var(--wobbly-lg);
     box-shadow: var(--shadow-lg);
     padding: 2rem 1.5rem;
     transform: rotate(1deg);
-    height: fit-content;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+}
+
+.info-panel.visible {
+    display: block;
+}
+
+/* Hide on mobile by default */
+@media (max-width: 768px) {
+    .info-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 400px;
+        max-height: 80vh;
+        z-index: 1000;
+    }
 }
 
 /* Thumbtack Decoration */
@@ -586,27 +624,14 @@ body::before {
         font-size: 1.125rem;
     }
 
-    #globe {
-        height: 400px;
-    }
-
-    .legend {
-        position: static;
-        margin-top: 1rem;
-        transform: rotate(0deg);
-        max-width: 100%;
-    }
-
-    .info-panel {
-        transform: rotate(0deg);
-    }
-
     .controls {
-        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .btn-primary,
     .btn-secondary {
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 120px;
     }
 }

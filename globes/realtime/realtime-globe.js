@@ -21,9 +21,13 @@ function init() {
     setupControls();
     startLiveData();
 
-    // Hide loading screen
+    // Hide loading screen and show welcome panel
     setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
+        // Show welcome info panel
+        const panel = document.getElementById('infoPanel');
+        panel.classList.add('visible');
+        panel.style.display = 'block';
     }, 1500);
 }
 
@@ -222,12 +226,64 @@ function showISSInfo(issData) {
     `;
 
     panel.style.display = 'block';
+    panel.classList.add('visible');
 }
 
 /**
  * Setup control buttons
  */
 function setupControls() {
+    // Show info panel
+    document.getElementById('showInfo').addEventListener('click', () => {
+        const panel = document.getElementById('infoPanel');
+        const isVisible = panel.style.display === 'block';
+
+        if (isVisible) {
+            panel.style.display = 'none';
+            panel.classList.remove('visible');
+        } else {
+            // Show welcome message
+            panel.querySelector('.info-content').innerHTML = `
+                <div class="info-header">
+                    <div class="icon-circle">🌍</div>
+                    <h2 class="info-title">Welcome to Real-Time Globe!</h2>
+                    <p class="info-subtitle">Live Earth Data Explorer</p>
+                </div>
+
+                <div class="info-body">
+                    <p class="hand-note">Hey there! 👋</p>
+                    <p>This globe shows Earth RIGHT NOW with:</p>
+
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <span class="check-mark">✓</span>
+                            <span><strong>Day/Night cycle</strong> based on actual sun position</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="check-mark">✓</span>
+                            <span><strong>ISS location</strong> updated every 5 seconds</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="check-mark">✓</span>
+                            <span><strong>Live earthquakes</strong> from the last 24 hours</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="check-mark">✓</span>
+                            <span><strong>Time zones</strong> showing current local time</span>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-icon">💡</div>
+                        <p><strong>Tip:</strong> Click on the ISS or any earthquake to see details!</p>
+                    </div>
+                </div>
+            `;
+            panel.style.display = 'block';
+            panel.classList.add('visible');
+        }
+    });
+
     // Reset view
     document.getElementById('resetView').addEventListener('click', () => {
         if (globe) {
@@ -267,7 +323,9 @@ function setupControls() {
 
     // Close info panel
     document.getElementById('closePanel').addEventListener('click', () => {
-        document.getElementById('infoPanel').style.display = 'none';
+        const panel = document.getElementById('infoPanel');
+        panel.style.display = 'none';
+        panel.classList.remove('visible');
     });
 
     console.log('[CONTROLS] All controls initialized');

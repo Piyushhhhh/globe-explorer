@@ -286,7 +286,7 @@ const ancientSites = [
         significance: "Covers 162 hectares. Built without mortar using sandstone blocks weighing up to 1.5 tons each.",
         discovery: "Never truly lost, but brought to Western attention by French explorer Henri Mouhot in 1860.",
         visitors: "2.6 million annually",
-        image: "https://images.unsplash.com/photo-1545058210-3042112eeb5e?w=600&q=80",
+        image: "https://images.unsplash.com/photo-1563492065297-9c0dbdeea0c7?w=600&q=80",
         icon: "🏛️",
         unesco: true
     },

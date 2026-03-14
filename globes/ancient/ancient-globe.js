@@ -144,8 +144,8 @@ function showRouteInfo(route) {
     const panel = document.getElementById('infoPanel');
     const content = document.getElementById('infoPanelContent');
 
-    // Default image if none provided
-    const imageUrl = route.image || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80';
+    // Default image if none provided - trade/caravan theme
+    const imageUrl = route.image || 'https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=600&q=80';
 
     content.innerHTML = `
         <div class="info-header">
@@ -163,7 +163,7 @@ function showRouteInfo(route) {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                    " onerror="this.src='https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80'">
+                    " onerror="this.src='https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=600&q=80'">
                 </div>
             ` : ''}
             <div class="site-icon">${route.icon || '🛤️'}</div>
@@ -339,8 +339,8 @@ function showSiteInfo(site) {
     const panel = document.getElementById('infoPanel');
     const content = document.getElementById('infoPanelContent');
 
-    // Default image if none provided
-    const imageUrl = site.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80';
+    // Default image if none provided - ancient ruins/archaeology theme
+    const imageUrl = site.image || 'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=600&q=80';
 
     content.innerHTML = `
         <div class="info-header">
@@ -358,7 +358,7 @@ function showSiteInfo(site) {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                    " onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80'">
+                    " onerror="this.src='https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=600&q=80'">
                 </div>
             ` : ''}
             <div class="site-icon">${site.icon || '🏛️'}</div>

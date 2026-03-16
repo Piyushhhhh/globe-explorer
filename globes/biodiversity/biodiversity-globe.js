@@ -915,21 +915,6 @@ function selectCountry(countryName, coords) {
                 </div>
             ` : ''}
 
-            ${enhancedData.images && enhancedData.images.length > 0 ? `
-                <div class="image-gallery">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                        <span>📸</span> Wildlife & Landscapes
-                    </h3>
-                    <div class="gallery-grid">
-                        ${enhancedData.images.map(img => `
-                            <div class="gallery-item">
-                                <img src="${img.url}" alt="${img.caption}" loading="lazy">
-                                <div class="gallery-caption">${img.caption}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
         </div>
     `;
 
@@ -963,11 +948,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Amazon Region Protected Areas program covering 154 million acres. Reduced deforestation by 70% between 2004-2012.',
             uniqueEcosystems: 'Amazon Rainforest, Atlantic Forest, Pantanal wetlands, Cerrado savanna',
             funFacts: 'Contains 20% of all bird species on Earth. Over 55,000 plant species - more than any other country.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800', caption: 'Jaguar in Amazon Rainforest' },
-                { url: 'https://images.unsplash.com/photo-1589553416260-f586c8f1514f?w=800', caption: 'Amazon River aerial view' },
-                { url: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800', caption: 'Toucan in Brazilian forest' }
-            ]
         },
         'Indonesia': {
             isHotspot: true,
@@ -979,11 +959,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Coral Triangle Initiative protecting marine ecosystems. Orangutan conservation programs in Borneo and Sumatra.',
             uniqueEcosystems: 'Tropical rainforests, Coral Triangle reefs, mangrove forests, volcanic islands',
             funFacts: 'Has more mammal species than any other country. The Coral Triangle contains 76% of all coral species.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1540206395-68808572332f?w=800', caption: 'Orangutan in Borneo rainforest' },
-                { url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800', caption: 'Komodo Dragon' },
-                { url: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800', caption: 'Coral reefs in Raja Ampat' }
-            ]
         },
         'Madagascar': {
             isHotspot: true,
@@ -995,11 +970,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Tripled protected areas from 2003-2018. Community-based conservation programs.',
             uniqueEcosystems: 'Spiny forests, rainforests, dry deciduous forests, unique limestone tsingy formations',
             funFacts: 'All lemurs are endemic to Madagascar. Has species found nowhere else like the fossa (cat-like carnivore).',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1596370743446-6a7ef43a36f9?w=800', caption: 'Ring-tailed lemurs' },
-                { url: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800', caption: 'Baobab trees avenue' },
-                { url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800', caption: 'Tsingy limestone formations' }
-            ]
         },
         'Democratic Republic of the Congo': {
             isHotspot: true,
@@ -1011,11 +981,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Virunga National Park protecting mountain gorillas. REDD+ forest conservation initiatives.',
             uniqueEcosystems: 'Congo rainforest, wetlands, savannas, mountain gorilla habitats',
             funFacts: 'Home to bonobos found nowhere else. The Congo Basin stores 8% of the world\'s forest carbon.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1551969014-7d2c4cddf0b6?w=800', caption: 'Mountain gorilla in Virunga' },
-                { url: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800', caption: 'Congo Basin rainforest' },
-                { url: 'https://images.unsplash.com/photo-1597873618537-4ee2c2628cf7?w=800', caption: 'Okapi in forest' }
-            ]
         },
         'Australia': {
             isHotspot: true,
@@ -1027,11 +992,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Great Barrier Reef Marine Park (world\'s largest). Indigenous-led conservation initiatives.',
             uniqueEcosystems: 'Great Barrier Reef, Outback desert, tropical rainforests, temperate forests',
             funFacts: 'Has the most venomous animals in the world. The Great Barrier Reef is visible from space.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1580735994845-e2f6c6a0dcb3?w=800', caption: 'Kangaroo in outback' },
-                { url: 'https://images.unsplash.com/photo-1587339603921-2eb5b66f68e2?w=800', caption: 'Great Barrier Reef coral' },
-                { url: 'https://images.unsplash.com/photo-1567828952351-63d5ab86e4d7?w=800', caption: 'Koala in eucalyptus tree' }
-            ]
         },
         'United States of America': {
             isHotspot: true,
@@ -1043,11 +1003,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'National Park System protecting 85 million acres. Endangered Species Act saved bald eagles, wolves.',
             uniqueEcosystems: 'Yellowstone geothermal, California redwoods, Everglades wetlands, Hawaiian islands',
             funFacts: 'Yellowstone was world\'s first national park (1872). Sequoia trees are Earth\'s largest living organisms.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', caption: 'Yellowstone National Park' },
-                { url: 'https://images.unsplash.com/photo-1568454537842-d933259bb258?w=800', caption: 'California redwood forest' },
-                { url: 'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800', caption: 'Bald eagle soaring' }
-            ]
         },
         'China': {
             isHotspot: true,
@@ -1059,11 +1014,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Giant Panda reserves increased population from 1,114 to 1,864. National park system expansion.',
             uniqueEcosystems: 'Himalayan forests, karst landscapes, Yangtze River basin, tropical Yunnan',
             funFacts: 'Giant pandas spend 14 hours a day eating bamboo. China has over 30,000 plant species.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800', caption: 'Giant panda eating bamboo' },
-                { url: 'https://images.unsplash.com/photo-1589729132389-8f0e0b55b91e?w=800', caption: 'Zhangjiajie National Forest' },
-                { url: 'https://images.unsplash.com/photo-1599387301025-85c0f82ea3c7?w=800', caption: 'Li River karst mountains' }
-            ]
         },
         'Peru': {
             isHotspot: true,
@@ -1075,11 +1025,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Community-based conservation in Amazon. Protecting cloud forests and marine reserves.',
             uniqueEcosystems: 'Amazon rainforest, cloud forests, Andes mountains, coastal deserts',
             funFacts: 'Has more bird species than anywhere in South America. Manu National Park has 1,000+ bird species.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800', caption: 'Andean spectacled bear' },
-                { url: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800', caption: 'Peruvian Amazon rainforest' },
-                { url: 'https://images.unsplash.com/photo-1446057032654-9d8885db76c6?w=800', caption: 'Andean condor flying' }
-            ]
         },
         'Colombia': {
             isHotspot: true,
@@ -1091,11 +1036,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Post-conflict reforestation. Amazon conservation partnerships.',
             uniqueEcosystems: 'Amazon rainforest, Andean cloud forests, Caribbean coast, Pacific coast',
             funFacts: 'Has more bird species than any other country (1,900+). Contains 10% of world\'s species.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800', caption: 'Colombian cloud forest' },
-                { url: 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=800', caption: 'Tropical hummingbird' },
-                { url: 'https://images.unsplash.com/photo-1601224236271-4c96c1037676?w=800', caption: 'Jaguar in rainforest' }
-            ]
         },
         'Ecuador': {
             isHotspot: true,
@@ -1107,11 +1047,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Constitutional rights for nature (world first). Galápagos Marine Reserve protection.',
             uniqueEcosystems: 'Galápagos Islands, Amazon rainforest, cloud forests, coastal mangroves',
             funFacts: 'Galápagos inspired Darwin\'s theory of evolution. Has 25,000 plant species in area smaller than Nevada.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800', caption: 'Galápagos giant tortoise' },
-                { url: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800', caption: 'Blue-footed booby' },
-                { url: 'https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800', caption: 'Galápagos marine iguana' }
-            ]
         },
         'Kenya': {
             protectedAreas: 12.7,
@@ -1122,11 +1057,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Anti-poaching success doubled elephant population since 1989. Community conservancies.',
             uniqueEcosystems: 'Savanna grasslands, Mount Kenya forests, coastal reefs, Great Rift Valley',
             funFacts: 'Wildebeest migration involves 1.5 million animals. Has Africa\'s "Big Five" game animals.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1534759926787-1f056e3c8ee9?w=800', caption: 'African elephants herd' },
-                { url: 'https://images.unsplash.com/photo-1484406566174-9da000fda645?w=800', caption: 'Masai Mara savanna sunset' },
-                { url: 'https://images.unsplash.com/photo-1558010178-2daab9e80080?w=800', caption: 'Lions in grassland' }
-            ]
         },
         'South Africa': {
             isHotspot: true,
@@ -1138,11 +1068,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Kruger National Park success. Rhino protection increasing populations.',
             uniqueEcosystems: 'Fynbos shrublands, savanna, Karoo desert, coastal marine ecosystems',
             funFacts: 'Cape Floral Region has 9,000 plant species (70% endemic). Table Mountain has more plant species than UK.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800', caption: 'White rhino in Kruger' },
-                { url: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800', caption: 'Cape Fynbos flowers' },
-                { url: 'https://images.unsplash.com/photo-1612707672777-8f1f72a8e3ac?w=800', caption: 'African penguin colony' }
-            ]
         },
         'India': {
             isHotspot: true,
@@ -1154,11 +1079,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Project Tiger increased tiger population from 1,400 to 3,000. Expanding protected areas.',
             uniqueEcosystems: 'Himalayan forests, Western Ghats, Sundarbans mangroves, coral reefs',
             funFacts: 'Has 70% of world\'s tigers. Sundarbans is largest mangrove forest and home to Bengal tigers.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1563510389-af5e6ce7f25f?w=800', caption: 'Bengal tiger in forest' },
-                { url: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800', caption: 'Western Ghats rainforest' },
-                { url: 'https://images.unsplash.com/photo-1551844511-2a83e6f5c13c?w=800', caption: 'Indian elephants' }
-            ]
         },
         'Mexico': {
             isHotspot: true,
@@ -1170,11 +1090,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Monarch Butterfly Biosphere Reserve. Marine protected areas in Gulf of California.',
             uniqueEcosystems: 'Cloud forests, deserts, tropical forests, coral reefs, volcanic islands',
             funFacts: 'Monarch butterfly migration destination. Chihuahuan Desert has most cactus diversity.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800', caption: 'Monarch butterfly swarm' },
-                { url: 'https://images.unsplash.com/photo-1565214975184-f5c9b0c3d90e?w=800', caption: 'Copper Canyon landscape' },
-                { url: 'https://images.unsplash.com/photo-1628273729925-b4cb1c4ca9c8?w=800', caption: 'Mexican gray wolf' }
-            ]
         },
         'Tanzania': {
             protectedAreas: 38.0,
@@ -1185,11 +1100,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Serengeti ecosystem protection. Community wildlife management areas.',
             uniqueEcosystems: 'Serengeti plains, Mount Kilimanjaro, Ngorongoro Crater, coastal forests',
             funFacts: 'Serengeti means "endless plains" in Maasai. Has the "Big Five" and Africa\'s highest peak.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800', caption: 'Wildebeest migration in Serengeti' },
-                { url: 'https://images.unsplash.com/photo-1621771464782-c0b0f9d5b16a?w=800', caption: 'Mount Kilimanjaro' },
-                { url: 'https://images.unsplash.com/photo-1489549132488-d00b7eee80f1?w=800', caption: 'Lions in Ngorongoro Crater' }
-            ]
         },
         'Antarctica': {
             protectedAreas: 100.0,
@@ -1200,11 +1110,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Antarctic Treaty protects the continent. Marine Protected Areas covering 2.8 million km². No mining or military activities allowed.',
             uniqueEcosystems: 'Ice sheets, Southern Ocean, glaciers, ice shelves, subglacial lakes',
             funFacts: 'Contains 90% of Earth\'s ice and 70% of fresh water. Emperor penguins dive up to 500m deep. No permanent human residents.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1511142810534-a5b19c2f8f8d?w=800', caption: 'Emperor penguins colony' },
-                { url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800', caption: 'Icebergs in Antarctic waters' },
-                { url: 'https://images.unsplash.com/photo-1477601263568-180e2c6d046e?w=800', caption: 'Humpback whale breaching' }
-            ]
         },
         'Iceland': {
             protectedAreas: 20.4,
@@ -1215,11 +1120,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Vatnajökull National Park (largest in Europe). Strong environmental protection laws. Leading renewable energy adoption.',
             uniqueEcosystems: 'Glaciers, geothermal areas, lava fields, waterfalls, fjords, volcanic highlands',
             funFacts: 'No forests but 11% covered by glaciers. Home to Arctic foxes (only native land mammal). Puffin colonies in summer.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=800', caption: 'Skogafoss waterfall' },
-                { url: 'https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?w=800', caption: 'Puffins on coastal cliffs' },
-                { url: 'https://images.unsplash.com/photo-1513415756133-bdd23f7ea7f0?w=800', caption: 'Geothermal pools and landscapes' }
-            ]
         },
         'Costa Rica': {
             isHotspot: true,
@@ -1231,11 +1131,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Reversed deforestation: 21% forest (1987) to 53% (2020). Payment for Ecosystem Services program. Carbon neutral goal.',
             uniqueEcosystems: 'Cloud forests, rainforests, mangroves, coral reefs, dry forests, wetlands',
             funFacts: 'No army since 1948 - invested in education and conservation instead. 500,000 species in area smaller than West Virginia.',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1566054757965-1f33bad07fa1?w=800', caption: 'Resplendent quetzal bird' },
-                { url: 'https://images.unsplash.com/photo-1512107099891-54eb7d7e5e5e?w=800', caption: 'Monteverde cloud forest' },
-                { url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800', caption: 'Three-toed sloth' }
-            ]
         },
         'New Zealand': {
             isHotspot: true,
@@ -1247,11 +1142,6 @@ function getEnhancedBioData(countryName, baseData) {
             conservation: 'Predator-free New Zealand 2050 initiative. Massive conservation efforts for kiwi, kakapo. DOC managing 30% of land.',
             uniqueEcosystems: 'Ancient podocarp forests, alpine regions, fjords, geothermal areas, marine reserves',
             funFacts: 'Kiwi birds evolved without predators (flightless). Kakapo is world\'s only flightless parrot. Tuatara are "living fossils".',
-            images: [
-                { url: 'https://images.unsplash.com/photo-1469521669194-babb5af5d6b3?w=800', caption: 'Milford Sound fjord' },
-                { url: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=800', caption: 'Ancient podocarp forest' },
-                { url: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=800', caption: 'Kiwi bird' }
-            ]
         }
     };
 

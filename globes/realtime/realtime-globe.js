@@ -9,9 +9,11 @@ let nightLightsEnabled = false;
 let citiesEnabled = true;
 let hurricanesEnabled = false;  // Disabled - NOAA API blocked by CORS
 let satellitesEnabled = true;   // Smooth point rendering
+let moonEnabled = true;         // Moon with accurate position tracking
 let citiesMarkers = [];
 let currentStorms = [];
 let currentSatellites = [];
+let currentMoonData = null;
 window.currentISSData = null;
 window.currentEarthquakes = [];
 
@@ -205,6 +207,9 @@ function startLiveData() {
     // Initialize satellites (static display)
     initSatellites();
 
+    // Initialize moon
+    initMoon();
+
     // Display cities
     displayCities();
 }
@@ -217,6 +222,55 @@ function updateISSMarker(issData) {
 
     window.currentISSData = issData;
     updateHtmlElements();
+}
+
+/**
+ * Initialize moon with accurate position tracking
+ */
+function initMoon() {
+    if (!moonEnabled) return;
+
+    console.log('[MOON] Initializing moon...');
+
+    // Get initial moon data
+    currentMoonData = MoonCalculator.getMoonInfo(new Date());
+
+    // Update moon stats in UI immediately
+    updateMoonStats();
+
+    // Update HTML elements to show moon
+    updateHtmlElements();
+
+    // Update moon position and stats every 5 minutes
+    setInterval(() => {
+        currentMoonData = MoonCalculator.getMoonInfo(new Date());
+        updateMoonStats();
+        updateHtmlElements();
+    }, 300000);
+
+    console.log('[MOON] Moon initialized');
+}
+
+
+/**
+ * Update moon statistics in UI
+ */
+function updateMoonStats() {
+    if (!currentMoonData) {
+        currentMoonData = MoonCalculator.getMoonInfo(new Date());
+    }
+
+    // Update moon phase display
+    const moonPhaseEl = document.getElementById('moonPhase');
+    if (moonPhaseEl) {
+        moonPhaseEl.textContent = `${currentMoonData.emoji} ${currentMoonData.position.phase}`;
+    }
+
+    // Update moon distance
+    const moonDistanceEl = document.getElementById('moonDistance');
+    if (moonDistanceEl) {
+        moonDistanceEl.textContent = MoonCalculator.formatDistance(currentMoonData.position.distance);
+    }
 }
 
 /**
@@ -383,13 +437,25 @@ function updateCities() {
 }
 
 /**
- * Update all HTML elements (ISS + Cities) on globe
+ * Update all HTML elements (Moon + ISS + Cities) on globe
  * This prevents conflicts between multiple markers using htmlElementsData
  */
 function updateHtmlElements() {
     if (!globe) return;
 
     const elements = [];
+
+    // Add moon if enabled
+    if (moonEnabled && currentMoonData) {
+        const pos = currentMoonData.position;
+        elements.push({
+            type: 'moon',
+            lat: pos.lat,
+            lng: pos.lng,
+            altitude: 0.5, // Higher altitude for visibility
+            data: currentMoonData
+        });
+    }
 
     // Add ISS if available
     if (window.currentISSData) {
@@ -424,7 +490,15 @@ function updateHtmlElements() {
             const el = document.createElement('div');
             el.style.pointerEvents = 'auto';
 
-            if (d.type === 'iss') {
+            if (d.type === 'moon') {
+                el.innerHTML = currentMoonData.emoji;
+                el.style.fontSize = '40px';
+                el.style.cursor = 'pointer';
+                el.style.textShadow = '0 0 30px rgba(255,255,200,0.9), 0 0 15px rgba(255,255,255,0.6), 2px 2px 6px rgba(0,0,0,0.8)';
+                el.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
+                el.title = 'The Moon - ' + currentMoonData.position.phase;
+                el.onclick = () => showMoonInfo();
+            } else if (d.type === 'iss') {
                 el.innerHTML = '🛰️';
                 el.style.fontSize = '24px';
                 el.style.cursor = 'pointer';
@@ -458,9 +532,10 @@ function updateHtmlElements() {
             return el;
         });
 
+    const moonCount = moonEnabled && currentMoonData ? 1 : 0;
     const issCount = window.currentISSData ? 1 : 0;
     const cityCount = citiesEnabled ? citiesMarkers.length : 0;
-    console.log(`[HTML] Updated ${elements.length} HTML markers (ISS: ${issCount}, Cities: ${cityCount})`);
+    console.log(`[HTML] Updated ${elements.length} HTML markers (Moon: ${moonCount}, ISS: ${issCount}, Cities: ${cityCount})`);
 }
 
 /**
@@ -763,6 +838,65 @@ function showISSInfo(issData) {
 }
 
 /**
+ * Show moon information panel
+ */
+function showMoonInfo() {
+    if (!currentMoonData) {
+        currentMoonData = MoonCalculator.getMoonInfo(new Date());
+    }
+
+    const panel = document.getElementById('infoPanel');
+    const content = panel.querySelector('.info-content');
+
+    const pos = currentMoonData.position;
+    const nextFull = currentMoonData.nextFullMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const nextNew = currentMoonData.nextNewMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    content.innerHTML = `
+        <div class="info-header">
+            <div class="icon-circle">${currentMoonData.emoji}</div>
+            <h2 class="info-title">The Moon</h2>
+            <p class="info-subtitle">${pos.phase}</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>${currentMoonData.emoji} Current Phase</h3>
+                <p style="font-size: 24px; font-weight: bold;">${pos.phase}</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">${pos.illumination.toFixed(1)}% illuminated</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌍 Distance from Earth</h3>
+                <p style="font-size: 24px; font-weight: bold;">${MoonCalculator.formatDistance(pos.distance)}</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Average: 384,400 km</p>
+            </div>
+            <div class="feature-card">
+                <h3>📍 Current Position</h3>
+                <p>${pos.lat.toFixed(2)}°, ${pos.lng.toFixed(2)}°</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Orbital position</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌕 Next Full Moon</h3>
+                <p style="font-size: 18px; font-weight: bold;">${nextFull}</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">In ${currentMoonData.daysToFullMoon} days</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌑 Next New Moon</h3>
+                <p style="font-size: 18px; font-weight: bold;">${nextNew}</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">In ${currentMoonData.daysToNewMoon} days</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌙 Moon Age</h3>
+                <p style="font-size: 24px; font-weight: bold;">${pos.age.toFixed(1)} days</p>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Lunar cycle: 29.5 days</p>
+            </div>
+        </div>
+    `;
+
+    panel.style.display = 'block';
+    panel.classList.add('visible');
+}
+
+/**
  * Setup control buttons
  */
 function setupControls() {
@@ -786,12 +920,16 @@ function setupControls() {
                         <p>Realistic lighting showing current day, night, and twilight zones</p>
                     </div>
                     <div class="feature-card">
+                        <h3>🌙 Moon Tracker</h3>
+                        <p>Real-time moon position with accurate phase tracking. Click moon or button for details!</p>
+                    </div>
+                    <div class="feature-card">
                         <h3>🛰️ ISS Tracker</h3>
                         <p>Live International Space Station position, updated every 5 seconds</p>
                     </div>
                     <div class="feature-card">
                         <h3>🛰️ Satellite Coverage</h3>
-                        <p>40 satellites from Starlink, OneWeb, and GPS constellations shown as simple dots</p>
+                        <p>40 satellites from Starlink, OneWeb, and GPS constellations</p>
                     </div>
                     <div class="feature-card">
                         <h3>🌀 Hurricane Tracking</h3>
@@ -817,6 +955,11 @@ function setupControls() {
         if (globe) {
             globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 1000);
         }
+    });
+
+    // Show moon info
+    document.getElementById('showMoon').addEventListener('click', () => {
+        showMoonInfo();
     });
 
     // Auto rotate toggle

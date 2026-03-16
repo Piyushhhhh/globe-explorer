@@ -62,6 +62,22 @@
                 </div>
 
                 <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🌙</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Moon Phase</div>
+                        <div class="stat-value-pro" id="moonPhase">🌕 Full Moon</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🌍</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Moon Distance</div>
+                        <div class="stat-value-pro" id="moonDistance">384,400 km</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
                     <div class="stat-icon-pro">🔴</div>
                     <div class="stat-content-pro">
                         <div class="stat-label-pro">Earthquakes (24h)</div>
@@ -111,6 +127,10 @@
                         <span>ISS Tracker</span>
                     </div>
                     <div class="legend-item-pro">
+                        <span style="font-size: 20px;">🌙</span>
+                        <span>Moon Position & Phase</span>
+                    </div>
+                    <div class="legend-item-pro">
                         <div class="legend-color-box" style="background: #00D9FF;"></div>
                         <span>Starlink Satellites</span>
                     </div>
@@ -158,6 +178,10 @@
                 <button id="resetView" class="btn-pro">
                     <span>🔄</span>
                     <span>Reset</span>
+                </button>
+                <button id="showMoon" class="btn-pro">
+                    <span>🌙</span>
+                    <span>Moon</span>
                 </button>
                 <button id="autoRotate" class="btn-pro">
                     <span>🔁</span>
@@ -228,6 +252,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/globe.gl"></script>
     <script src="/globes/realtime/sun-calculator.js"></script>
+    <script src="/globes/realtime/moon-calculator.js"></script>
     <script src="/globes/realtime/day-night-shader.js"></script>
     <script src="/globes/realtime/realtime-data.js"></script>
     <script src="/globes/realtime/cities-data.js"></script>

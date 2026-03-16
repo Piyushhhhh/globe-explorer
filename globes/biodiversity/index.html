@@ -19,6 +19,22 @@
             <p class="subtitle">Explore wildlife and forests across the world</p>
         </header>
 
+        <!-- Soundscape Indicator -->
+        <div class="soundscape-indicator" id="soundscapeIndicator"></div>
+
+        <!-- Quick Facts Overlay -->
+        <div class="facts-overlay" id="factsOverlay"></div>
+
+        <!-- Facts Toggle Button -->
+        <button class="facts-toggle" id="factsToggle">💡 Facts</button>
+
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle" id="viewModeToggle">
+            <button class="mode-btn active" data-mode="land">🌲 Land</button>
+            <button class="mode-btn" data-mode="ocean">🌊 Ocean</button>
+            <button class="mode-btn" data-mode="both">🌍 Both</button>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Globe Container -->
@@ -27,6 +43,7 @@
                 <div class="controls">
                     <button id="resetView">Reset View</button>
                     <button id="autoRotate">Auto Rotate</button>
+                    <button id="toggleSound">🔊 Sound ON</button>
                 </div>
             </div>
 
@@ -67,6 +84,39 @@
                 </div>
             </div>
         </footer>
+
+        <!-- Legend -->
+        <div class="legend" id="legend">
+            <div class="legend-header" id="legendToggle">
+                <span class="legend-icon">🌳</span>
+                <span class="legend-title">FOREST COVERAGE</span>
+                <span class="legend-collapse" id="legendArrow">▼</span>
+            </div>
+            <div class="legend-content" id="legendContent">
+                <div class="legend-divider"></div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(46, 204, 113, 0.7)"></div>
+                    <div class="legend-label">>50%</div>
+                    <div class="legend-desc">Dense Forests</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(52, 152, 219, 0.7)"></div>
+                    <div class="legend-label">30-50%</div>
+                    <div class="legend-desc">Moderate Coverage</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(243, 156, 18, 0.7)"></div>
+                    <div class="legend-label">10-30%</div>
+                    <div class="legend-desc">Limited Forests</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(231, 76, 60, 0.7)"></div>
+                    <div class="legend-label"><10%</div>
+                    <div class="legend-desc">Sparse Vegetation</div>
+                </div>
+                <div class="legend-tip">💡 Click countries for details</div>
+            </div>
+        </div>
     </div>
 
     <!-- Loading Screen -->
@@ -78,20 +128,14 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/globe.gl"></script>
     <script src="/globes/biodiversity/biodiversity-data.js"></script>
+    <script src="/globes/biodiversity/biodiversity-facts.js"></script>
+    <script src="/globes/biodiversity/biodiversity-living.js"></script>
     <script src="/globes/biodiversity/biodiversity-globe.js"></script>
-    <script src="/globes/biodiversity/biodiversity-enhanced.js"></script>
-
-    <!-- Enhanced Styles -->
-    <link rel="stylesheet" href="/globes/biodiversity/biodiversity-enhanced.css">
 
     <script>
-        // Initialize enhanced features after page load
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (typeof initializeEnhancedFeatures === 'function') {
-                    initializeEnhancedFeatures();
-                }
-            }, 1000);
+        // Initialize facts toggle
+        document.getElementById('factsToggle')?.addEventListener('click', () => {
+            window.showFactOverlay();
         });
     </script>
 </body>

@@ -12,7 +12,15 @@ const biodiversityData = {
         iconicAnimals: ["jaguar", "toucan", "sloth", "macaw"],
         biomes: ["Amazon Rainforest", "Atlantic Forest", "Pantanal"],
         color: "#2ecc71",
-        rank: 1
+        rank: 1,
+        marineData: {
+            coralReefArea: 3200,
+            marineSpecies: 1300,
+            marineProtectedAreas: 26.4,
+            oceanicAnimals: ["sea-turtle", "dolphin", "humpback-whale", "reef-fish", "seahorse"],
+            marineThreats: ["coastal-development", "oil-spills", "overfishing", "pollution"],
+            coralHealth: "moderate"
+        }
     },
     "Indonesia": {
         speciesCount: 47350,
@@ -22,7 +30,15 @@ const biodiversityData = {
         iconicAnimals: ["orangutan", "komodo", "tiger", "elephant"],
         biomes: ["Tropical Rainforest", "Coral Reefs"],
         color: "#e74c3c",
-        rank: 2
+        rank: 2,
+        marineData: {
+            coralReefArea: 51000,
+            marineSpecies: 6000,
+            marineProtectedAreas: 17.8,
+            oceanicAnimals: ["whale-shark", "manta-ray", "sea-turtle", "coral-fish", "nautilus"],
+            marineThreats: ["overfishing", "blast-fishing", "coral-bleaching", "plastic-pollution"],
+            coralHealth: "poor"
+        }
     },
     "Colombia": {
         speciesCount: 63160,
@@ -52,7 +68,15 @@ const biodiversityData = {
         iconicAnimals: ["kangaroo", "koala", "platypus", "wombat"],
         biomes: ["Outback", "Great Barrier Reef", "Rainforest"],
         color: "#3498db",
-        rank: 5
+        rank: 5,
+        marineData: {
+            coralReefArea: 48960,
+            marineSpecies: 4500,
+            marineProtectedAreas: 45.2,
+            oceanicAnimals: ["whale-shark", "manta-ray", "sea-turtle", "dolphin", "dugong"],
+            marineThreats: ["coral-bleaching", "crown-of-thorns-starfish", "climate-change", "cyclones"],
+            coralHealth: "moderate"
+        }
     },
     "Peru": {
         speciesCount: 25670,
@@ -72,7 +96,15 @@ const biodiversityData = {
         iconicAnimals: ["jaguar", "axolotl", "quetzal", "monarch-butterfly"],
         biomes: ["Tropical Forests", "Deserts", "Mountains"],
         color: "#27ae60",
-        rank: 7
+        rank: 7,
+        marineData: {
+            coralReefArea: 1780,
+            marineSpecies: 2150,
+            marineProtectedAreas: 23.1,
+            oceanicAnimals: ["gray-whale", "sea-turtle", "vaquita", "hammerhead-shark", "manta-ray"],
+            marineThreats: ["overfishing", "bycatch", "coastal-development", "gillnets"],
+            coralHealth: "moderate"
+        }
     },
     "Madagascar": {
         speciesCount: 12550,
@@ -82,7 +114,15 @@ const biodiversityData = {
         iconicAnimals: ["lemur", "fossa", "chameleon", "baobab"],
         biomes: ["Rainforest", "Dry Forest", "Spiny Forest"],
         color: "#e74c3c",
-        rank: 8
+        rank: 8,
+        marineData: {
+            coralReefArea: 2230,
+            marineSpecies: 1200,
+            marineProtectedAreas: 4.8,
+            oceanicAnimals: ["whale-shark", "humpback-whale", "sea-turtle", "coelacanth", "dugong"],
+            marineThreats: ["overfishing", "destructive-fishing", "climate-change", "low-protection"],
+            coralHealth: "poor"
+        }
     },
     "India": {
         speciesCount: 47000,
@@ -102,7 +142,15 @@ const biodiversityData = {
         iconicAnimals: ["blue-footed-booby", "jaguar", "condor", "toucan"],
         biomes: ["Amazon", "Andes", "Galápagos"],
         color: "#2ecc71",
-        rank: 10
+        rank: 10,
+        marineData: {
+            coralReefArea: 28,
+            marineSpecies: 2900,
+            marineProtectedAreas: 97.5,
+            oceanicAnimals: ["hammerhead-shark", "sea-lion", "marine-iguana", "penguin", "manta-ray"],
+            marineThreats: ["illegal-fishing", "climate-change", "invasive-species", "tourism"],
+            coralHealth: "good"
+        }
     },
     "United States of America": {
         speciesCount: 29740,
@@ -202,7 +250,15 @@ const biodiversityData = {
         iconicAnimals: ["tarsier", "philippine-eagle", "tamaraw"],
         biomes: ["Tropical Forests", "Coral Reefs"],
         color: "#e74c3c",
-        rank: 19
+        rank: 19,
+        marineData: {
+            coralReefArea: 25060,
+            marineSpecies: 5000,
+            marineProtectedAreas: 13.4,
+            oceanicAnimals: ["whale-shark", "thresher-shark", "sea-turtle", "clownfish", "grouper"],
+            marineThreats: ["dynamite-fishing", "overfishing", "coral-bleaching", "tourism-pressure"],
+            coralHealth: "poor"
+        }
     },
     "Costa Rica": {
         speciesCount: 12730,
@@ -212,7 +268,15 @@ const biodiversityData = {
         iconicAnimals: ["quetzal", "sloth", "poison-frog", "toucan"],
         biomes: ["Rainforest", "Cloud Forest", "Dry Forest"],
         color: "#2ecc71",
-        rank: 20
+        rank: 20,
+        marineData: {
+            coralReefArea: 970,
+            marineSpecies: 6700,
+            marineProtectedAreas: 30.5,
+            oceanicAnimals: ["humpback-whale", "sea-turtle", "dolphin", "sailfish", "ray"],
+            marineThreats: ["illegal-fishing", "coastal-development", "climate-change", "pollution"],
+            coralHealth: "good"
+        }
     },
     "Thailand": {
         speciesCount: 8150,
@@ -1622,7 +1686,15 @@ const biodiversityData = {
         iconicAnimals: ["turtle", "bird", "fish"],
         biomes: ["Island", "Coral Reefs"],
         color: "#2ecc71",
-        rank: 160
+        rank: 160,
+        marineData: {
+            coralReefArea: 1690,
+            marineSpecies: 1000,
+            marineProtectedAreas: 32.0,
+            oceanicAnimals: ["whale-shark", "manta-ray", "sea-turtle", "grouper", "parrotfish"],
+            marineThreats: ["climate-change", "coral-bleaching", "overfishing", "tourism"],
+            coralHealth: "moderate"
+        }
     },
     "Mauritius": {
         speciesCount: 1300,
@@ -1786,7 +1858,15 @@ const biodiversityData = {
         iconicAnimals: ["dugong", "turtle", "fish"],
         biomes: ["Marine", "Forests"],
         color: "#2ecc71",
-        rank: 176
+        rank: 176,
+        marineData: {
+            coralReefArea: 550,
+            marineSpecies: 1300,
+            marineProtectedAreas: 80.0,
+            oceanicAnimals: ["dugong", "manta-ray", "sea-turtle", "shark", "jellyfish"],
+            marineThreats: ["climate-change", "ocean-acidification", "illegal-fishing"],
+            coralHealth: "excellent"
+        }
     },
     "Micronesia": {
         speciesCount: 1300,
@@ -1919,7 +1999,31 @@ const animalEmojis = {
     "dugong": "🐋",
     "fish": "🐟",
     "bat": "🦇",
-    "elk": "🦌"
+    "elk": "🦌",
+    // Marine animals
+    "whale-shark": "🦈",
+    "manta-ray": "🐠",
+    "sea-turtle": "🐢",
+    "dolphin": "🐬",
+    "coral-fish": "🐠",
+    "nautilus": "🐚",
+    "thresher-shark": "🦈",
+    "clownfish": "🐠",
+    "grouper": "🐟",
+    "gray-whale": "🐋",
+    "vaquita": "🐬",
+    "hammerhead-shark": "🦈",
+    "coelacanth": "🐟",
+    "humpback-whale": "🐋",
+    "reef-fish": "🐠",
+    "seahorse": "🐴",
+    "sea-lion": "🦭",
+    "marine-iguana": "🦎",
+    "sailfish": "🐟",
+    "ray": "🐟",
+    "parrotfish": "🐠",
+    "shark": "🦈",
+    "jellyfish": "🪼"
 };
 
 // Forest types

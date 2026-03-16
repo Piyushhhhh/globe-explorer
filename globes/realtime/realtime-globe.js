@@ -6,6 +6,14 @@
 let globe;
 let autoRotateEnabled = false;
 let nightLightsEnabled = false;
+let citiesEnabled = true;
+let hurricanesEnabled = false;  // Disabled - NOAA API blocked by CORS
+let satellitesEnabled = true;   // Smooth point rendering
+let citiesMarkers = [];
+let currentStorms = [];
+let currentSatellites = [];
+window.currentISSData = null;
+window.currentEarthquakes = [];
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
@@ -21,13 +29,9 @@ function init() {
     setupControls();
     startLiveData();
 
-    // Hide loading screen and show welcome panel
+    // Hide loading screen
     setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
-        // Show welcome info panel
-        const panel = document.getElementById('infoPanel');
-        panel.classList.add('visible');
-        panel.style.display = 'block';
     }, 1500);
 }
 
@@ -109,17 +113,17 @@ function updateDayNightPolygons() {
         .polygonCapColor(d => {
             switch (d.timeOfDay) {
                 case 'day':
-                    return 'rgba(255, 255, 255, 0.05)'; // Bright/transparent
+                    return 'rgba(255, 250, 200, 0.15)'; // Bright sunlight - warm yellow tint
                 case 'twilight':
-                    return 'rgba(255, 140, 70, 0.25)'; // Orange twilight
+                    return 'rgba(255, 120, 50, 0.5)'; // Golden hour - vibrant orange/pink
                 case 'night':
-                    return 'rgba(20, 30, 70, 0.5)'; // Dark blue night
+                    return 'rgba(5, 10, 35, 0.85)'; // Deep night - dark navy blue
                 default:
                     return 'rgba(255, 255, 255, 0.1)';
             }
         })
-        .polygonSideColor(() => 'rgba(100, 100, 100, 0.1)')
-        .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.3)')
+        .polygonSideColor(() => 'rgba(100, 100, 100, 0.15)')
+        .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.2)')
         .polygonAltitude(0.001);
 
     console.log('[DAY/NIGHT] Polygons updated at', now.toISOString());
@@ -192,6 +196,17 @@ function startLiveData() {
             updateEarthquakes(data);
         }
     });
+
+    // Fetch hurricanes
+    fetchHurricanes();
+    // Refresh hurricanes every 30 minutes
+    setInterval(fetchHurricanes, 1800000);
+
+    // Initialize satellites (static display)
+    initSatellites();
+
+    // Display cities
+    displayCities();
 }
 
 /**
@@ -200,35 +215,18 @@ function startLiveData() {
 function updateISSMarker(issData) {
     if (!globe || !issData) return;
 
-    const marker = [{
-        lat: issData.lat,
-        lng: issData.lng,
-        label: `🛰️ ISS`,
-        altitude: 0.02,
-        color: '#FFD700',
-        size: 1.5
-    }];
-
-    globe
-        .htmlElementsData(marker)
-        .htmlElement(d => {
-            const el = document.createElement('div');
-            el.innerHTML = d.label;
-            el.style.fontSize = '24px';
-            el.style.cursor = 'pointer';
-            el.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
-            el.onclick = () => showISSInfo(issData);
-            return el;
-        });
+    window.currentISSData = issData;
+    updateHtmlElements();
 }
 
 /**
- * Update earthquake markers
+ * Update earthquake markers (combined with satellites to avoid conflicts)
  */
 function updateEarthquakes(earthquakes) {
     if (!globe || !earthquakes || earthquakes.length === 0) return;
 
     const markers = earthquakes.map(eq => ({
+        type: 'earthquake',
         lat: eq.lat,
         lng: eq.lng,
         size: RealtimeData.getEarthquakeSize(eq.magnitude),
@@ -239,25 +237,483 @@ function updateEarthquakes(earthquakes) {
         url: eq.url
     }));
 
+    // Store for combined rendering
+    window.currentEarthquakes = markers;
+    updateAllPoints();
+
+    console.log(`[EARTHQUAKES] Updated ${earthquakes.length} markers`);
+}
+
+/**
+ * Update all points (earthquakes + satellites) to avoid conflicts
+ */
+function updateAllPoints() {
+    if (!globe) return;
+
+    const allPoints = [];
+
+    // Add earthquakes if available
+    if (window.currentEarthquakes && window.currentEarthquakes.length > 0) {
+        allPoints.push(...window.currentEarthquakes);
+    }
+
+    // Add satellites if enabled
+    if (satellitesEnabled && currentSatellites.length > 0) {
+        currentSatellites.forEach(sat => {
+            allPoints.push({
+                type: 'satellite',
+                lat: sat.lat,
+                lng: sat.lng,
+                size: 0.4,  // Larger for visibility
+                color: SatellitesData.getSatelliteColor(sat),
+                name: sat.name,
+                constellation: sat.constellation,
+                altitude: sat.altitude,
+                satelliteType: sat.type
+            });
+        });
+    }
+
     globe
-        .pointsData(markers)
+        .pointsData(allPoints)
         .pointColor('color')
-        .pointAltitude(0.005)
+        .pointAltitude(d => d.type === 'satellite' ? 0.008 : 0.01)
         .pointRadius('size')
-        .pointLabel(d => `
-            <div style="background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; color: white; font-family: 'Patrick Hand', cursive;">
-                <strong>Magnitude ${d.magnitude}</strong><br/>
-                ${RealtimeData.formatPlace(d.place)}<br/>
-                <small>${new Date(d.time).toLocaleString()}</small>
-            </div>
-        `)
+        .pointLabel(d => {
+            if (d.type === 'earthquake') {
+                return `
+                    <div style="background: rgba(0,0,0,0.9); padding: 12px 16px; border-radius: 12px; color: white; font-family: var(--font-display); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+                        <strong style="font-size: 16px; color: #ff6b6b;">Magnitude ${d.magnitude}</strong><br/>
+                        <span style="font-size: 13px;">${RealtimeData.formatPlace(d.place)}</span><br/>
+                        <small style="opacity: 0.7; font-size: 11px;">${new Date(d.time).toLocaleString()}</small>
+                    </div>
+                `;
+            } else if (d.type === 'satellite') {
+                return `
+                    <div style="background: rgba(0,0,0,0.9); padding: 12px 16px; border-radius: 12px; color: white; font-family: var(--font-display); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+                        <strong style="font-size: 16px; color: ${d.color};">${d.name}</strong><br/>
+                        <span style="font-size: 13px;">${d.constellation.toUpperCase()} - ${d.satelliteType}</span><br/>
+                        <small style="opacity: 0.7; font-size: 11px;">Altitude: ${Math.round(d.altitude)} km</small>
+                    </div>
+                `;
+            }
+        })
         .onPointClick(point => {
-            if (point.url) {
+            if (point.type === 'earthquake' && point.url) {
                 window.open(point.url, '_blank');
+            } else if (point.type === 'satellite') {
+                showSatelliteInfo(point);
             }
         });
 
-    console.log(`[EARTHQUAKES] Updated ${earthquakes.length} markers`);
+    const eqCount = allPoints.filter(p => p.type === 'earthquake').length;
+    const satCount = allPoints.filter(p => p.type === 'satellite').length;
+    console.log(`[POINTS] Displaying ${eqCount} earthquakes + ${satCount} satellites`);
+}
+
+
+/**
+ * Display major cities
+ */
+async function displayCities() {
+    if (!citiesEnabled) return;
+
+    const cities = citiesData.getCitiesWithTime();
+
+    // Fetch weather for first batch of cities
+    console.log('[CITIES] Fetching weather data...');
+    await fetchCitiesWeather(cities);
+
+    citiesMarkers = cities;
+    updateCities();
+
+    // Update weather every 15 minutes (less aggressive to avoid rate limits)
+    setInterval(async () => {
+        if (citiesEnabled) {
+            const updatedCities = citiesData.getCitiesWithTime();
+            await fetchCitiesWeather(updatedCities);
+            citiesMarkers = updatedCities;
+            updateCities();
+        }
+    }, 900000); // 15 minutes
+
+    // Update times every minute (without refetching weather)
+    setInterval(() => {
+        if (citiesEnabled) {
+            citiesMarkers = citiesMarkers.map(city => ({
+                ...city,
+                localTime: citiesData.getLocalTime(city.tz)
+            }));
+            updateCities();
+        }
+    }, 60000);
+}
+
+/**
+ * Fetch weather for multiple cities with proper rate limiting
+ */
+async function fetchCitiesWeather(cities) {
+    console.log('[WEATHER] Fetching weather for cities with rate limiting...');
+
+    // Fetch one at a time with delays to avoid rate limits
+    for (let i = 0; i < cities.length; i++) {
+        const city = cities[i];
+        try {
+            const weather = await citiesData.fetchWeather(city);
+            if (weather) {
+                city.weather = weather;
+            }
+            // Wait 200ms between requests to respect rate limits
+            await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (error) {
+            console.warn(`[WEATHER] Failed for ${city.name}, skipping`);
+            // Continue with other cities even if one fails
+        }
+    }
+
+    console.log('[WEATHER] ✓ Weather fetching complete');
+}
+
+/**
+ * Update city markers
+ */
+function updateCities() {
+    updateHtmlElements();
+    console.log(`[CITIES] Displaying ${citiesMarkers.length} cities`);
+}
+
+/**
+ * Update all HTML elements (ISS + Cities) on globe
+ * This prevents conflicts between multiple markers using htmlElementsData
+ */
+function updateHtmlElements() {
+    if (!globe) return;
+
+    const elements = [];
+
+    // Add ISS if available
+    if (window.currentISSData) {
+        elements.push({
+            type: 'iss',
+            lat: window.currentISSData.lat,
+            lng: window.currentISSData.lng,
+            altitude: 0.02,
+            data: window.currentISSData
+        });
+    }
+
+    // Add cities if enabled
+    if (citiesEnabled && citiesMarkers.length > 0) {
+        citiesMarkers.forEach(city => {
+            elements.push({
+                type: 'city',
+                lat: city.lat,
+                lng: city.lng,
+                altitude: 0.01,
+                data: city
+            });
+        });
+    }
+
+    globe
+        .htmlElementsData(elements)
+        .htmlLat(d => d.lat)
+        .htmlLng(d => d.lng)
+        .htmlAltitude(d => d.altitude)
+        .htmlElement(d => {
+            const el = document.createElement('div');
+            el.style.pointerEvents = 'auto';
+
+            if (d.type === 'iss') {
+                el.innerHTML = '🛰️';
+                el.style.fontSize = '24px';
+                el.style.cursor = 'pointer';
+                el.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+                el.title = 'International Space Station';
+                el.onclick = () => showISSInfo(d.data);
+            } else if (d.type === 'city') {
+                const city = d.data;
+                el.style.cssText = `
+                    color: ${city.isDaytime ? '#FFD700' : '#87CEEB'};
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8);
+                    pointer-events: auto;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                `;
+
+                let text = city.name;
+                if (city.weather && city.weather.emoji && city.weather.temp !== undefined) {
+                    text = `${city.name} ${city.weather.emoji} ${city.weather.temp}°`;
+                } else if (city.weather && city.weather.temp !== undefined) {
+                    text = `${city.name} 🌍 ${city.weather.temp}°`;
+                }
+
+                el.textContent = text;
+                el.onclick = () => showCityInfo(city);
+            }
+
+            return el;
+        });
+
+    const issCount = window.currentISSData ? 1 : 0;
+    const cityCount = citiesEnabled ? citiesMarkers.length : 0;
+    console.log(`[HTML] Updated ${elements.length} HTML markers (ISS: ${issCount}, Cities: ${cityCount})`);
+}
+
+/**
+ * Fetch and display hurricanes
+ */
+async function fetchHurricanes() {
+    try {
+        const storms = await hurricanesData.fetchStorms();
+        currentStorms = storms;
+
+        // Update count
+        if (document.getElementById('stormsCount')) {
+            const countEl = document.getElementById('stormsCount');
+            countEl.textContent = storms.length;
+
+            // Add tooltip if CORS blocked
+            if (storms.length === 0) {
+                countEl.title = 'NOAA API unavailable due to browser CORS restrictions';
+                countEl.style.opacity = '0.6';
+            }
+        }
+
+        if (hurricanesEnabled) {
+            updateHurricanes();
+        }
+    } catch (error) {
+        console.error('[HURRICANES] Failed to fetch:', error);
+
+        // Show 0 with explanation
+        if (document.getElementById('stormsCount')) {
+            const countEl = document.getElementById('stormsCount');
+            countEl.textContent = '0';
+            countEl.title = 'Hurricane data unavailable';
+            countEl.style.opacity = '0.6';
+        }
+    }
+}
+
+/**
+ * Update hurricane markers on globe
+ */
+function updateHurricanes() {
+    updateAllRings();
+}
+
+/**
+ * Update all rings (hurricanes only - satellites moved to HTML elements)
+ */
+function updateAllRings() {
+    if (!globe) return;
+
+    const allRings = [];
+
+    // Add hurricane rings if enabled
+    if (hurricanesEnabled && currentStorms.length > 0) {
+        currentStorms.forEach(storm => {
+            allRings.push({
+                type: 'storm',
+                lat: storm.lat,
+                lng: storm.lng,
+                maxR: HurricanesData.getStormSize(storm),
+                propagationSpeed: 0.4,
+                repeatPeriod: 1500,
+                color: HurricanesData.getStormColor(storm),
+                data: storm
+            });
+        });
+    }
+
+    globe
+        .ringsData(allRings)
+        .ringColor('color')
+        .ringMaxRadius('maxR')
+        .ringPropagationSpeed('propagationSpeed')
+        .ringRepeatPeriod('repeatPeriod')
+        .ringAltitude(0.005);
+
+    const stormCount = allRings.length;
+    console.log(`[RINGS] Displaying ${stormCount} storms`);
+}
+
+/**
+ * Initialize satellites - smooth point rendering with fixed positions
+ */
+function initSatellites() {
+    // Generate once and cache - positions won't change
+    currentSatellites = satellitesData.generateConstellationView();
+
+    // Pre-select which satellites to display (40 total) - this list stays fixed
+    const starlinkSats = currentSatellites.filter(s => s.constellation === 'starlink').slice(0, 20);
+    const onewebSats = currentSatellites.filter(s => s.constellation === 'oneweb').slice(0, 10);
+    const gpsSats = currentSatellites.filter(s => s.constellation === 'gps').slice(0, 10);
+    currentSatellites = [...starlinkSats, ...onewebSats, ...gpsSats];
+
+    // Update count
+    if (document.getElementById('satellitesCount')) {
+        document.getElementById('satellitesCount').textContent = currentSatellites.length;
+    }
+
+    // Update display
+    updateAllPoints();
+
+    console.log('[SATELLITES] Initialized with 40 fixed satellites');
+}
+
+/**
+ * Update satellite positions (disabled - static display)
+ */
+function updateSatellitePositions() {
+    // Satellites are now static - no position updates
+}
+
+/**
+ * Display satellites - now handled by updateAllPoints
+ */
+function updateSatellites() {
+    updateAllPoints();
+}
+
+/**
+ * Show storm information panel
+ */
+function showStormInfo(storm) {
+    const panel = document.getElementById('infoPanel');
+    const content = panel.querySelector('.info-content');
+
+    const category = HurricanesData.getStormCategory(storm);
+
+    content.innerHTML = `
+        <div class="info-header">
+            <div class="icon-circle">🌀</div>
+            <h2 class="info-title">${storm.name || 'Unnamed Storm'}</h2>
+            <p class="info-subtitle">${category}</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>💨 Wind Speed</h3>
+                <p style="font-size: 24px; font-weight: bold;">${storm.windSpeed || 'N/A'} mph</p>
+            </div>
+            <div class="feature-card">
+                <h3>📍 Position</h3>
+                <p>${storm.lat.toFixed(2)}°, ${storm.lng.toFixed(2)}°</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌡️ Pressure</h3>
+                <p>${storm.pressure || 'N/A'} mb</p>
+            </div>
+            <div class="feature-card">
+                <h3>➡️ Movement</h3>
+                <p>${storm.movement || 'N/A'}</p>
+            </div>
+            ${storm.link ? `
+                <div class="feature-card">
+                    <h3>ℹ️ More Info</h3>
+                    <p><a href="${storm.link}" target="_blank" style="color: #3b82f6;">NOAA Storm Page →</a></p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    panel.style.display = 'block';
+    panel.classList.add('visible');
+}
+
+/**
+ * Show satellite information panel
+ */
+function showSatelliteInfo(satellite) {
+    const panel = document.getElementById('infoPanel');
+    const content = panel.querySelector('.info-content');
+
+    const constellationNames = {
+        starlink: 'Starlink',
+        oneweb: 'OneWeb',
+        gps: 'GPS'
+    };
+
+    const constellationInfo = {
+        starlink: 'SpaceX low-Earth orbit internet constellation',
+        oneweb: 'Global satellite internet provider',
+        gps: 'Global Positioning System navigation satellites'
+    };
+
+    content.innerHTML = `
+        <div class="info-header">
+            <h2 class="info-title">${satellite.name}</h2>
+            <p class="info-subtitle">${constellationNames[satellite.constellation] || satellite.constellation}</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>📡 Type</h3>
+                <p>${satellite.satelliteType || 'Communications'}</p>
+            </div>
+            <div class="feature-card">
+                <h3>🛰️ Constellation</h3>
+                <p>${constellationNames[satellite.constellation] || satellite.constellation}</p>
+                <p style="font-size: 12px; opacity: 0.8; margin-top: 4px;">${constellationInfo[satellite.constellation] || ''}</p>
+            </div>
+            <div class="feature-card">
+                <h3>⬆️ Altitude</h3>
+                <p style="font-size: 24px; font-weight: bold;">${Math.round(satellite.altitude)} km</p>
+            </div>
+            <div class="feature-card">
+                <h3>📍 Position</h3>
+                <p>${satellite.lat.toFixed(2)}°, ${satellite.lng.toFixed(2)}°</p>
+            </div>
+        </div>
+    `;
+
+    panel.style.display = 'block';
+    panel.classList.add('visible');
+}
+
+/**
+ * Show city information panel
+ */
+function showCityInfo(city) {
+    const panel = document.getElementById('infoPanel');
+    const content = panel.querySelector('.info-content');
+
+    const weatherInfo = city.weather
+        ? `
+            <div class="feature-card">
+                <h3>${city.weather.emoji} ${city.weather.description}</h3>
+                <p style="font-size: 28px; font-weight: bold;">${city.weather.temp}°C</p>
+            </div>
+          `
+        : '';
+
+    content.innerHTML = `
+        <div class="info-header">
+            <h2 class="info-title">${city.name}, ${city.country}</h2>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>⏰ Local Time</h3>
+                <p style="font-size: 20px; font-weight: bold;">${city.localTime}</p>
+                <p style="font-size: 14px; opacity: 0.8;">${city.isDaytime ? '☀️ Daytime' : '🌙 Nighttime'}</p>
+            </div>
+            ${weatherInfo}
+            <div class="feature-card">
+                <h3>📍 Coordinates</h3>
+                <p>${city.lat.toFixed(4)}°, ${city.lng.toFixed(4)}°</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌍 Timezone</h3>
+                <p>${city.tz}</p>
+            </div>
+        </div>
+    `;
+
+    panel.style.display = 'block';
+    panel.classList.add('visible');
 }
 
 /**
@@ -322,37 +778,32 @@ function setupControls() {
             // Show welcome message
             panel.querySelector('.info-content').innerHTML = `
                 <div class="info-header">
-                    <div class="icon-circle">🌍</div>
-                    <h2 class="info-title">Welcome to Real-Time Globe!</h2>
-                    <p class="info-subtitle">Live Earth Data Explorer</p>
+                    <h2 class="info-title">Welcome to Real-Time Globe</h2>
                 </div>
-
-                <div class="info-body">
-                    <p class="hand-note">Hey there! 👋</p>
-                    <p>This globe shows Earth RIGHT NOW with:</p>
-
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <span class="check-mark">✓</span>
-                            <span><strong>Realistic day/night shading</strong> - dark areas are night, orange is twilight, bright is day</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="check-mark">✓</span>
-                            <span><strong>ISS location</strong> updated every 5 seconds</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="check-mark">✓</span>
-                            <span><strong>Live earthquakes</strong> from the last 24 hours</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="check-mark">✓</span>
-                            <span><strong>Time zones</strong> showing current local time</span>
-                        </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🌍 Day/Night Cycle</h3>
+                        <p>Realistic lighting showing current day, night, and twilight zones</p>
                     </div>
-
-                    <div class="tip-box">
-                        <div class="tip-icon">💡</div>
-                        <p><strong>Tip:</strong> Click on the ISS or any earthquake to see details!</p>
+                    <div class="feature-card">
+                        <h3>🛰️ ISS Tracker</h3>
+                        <p>Live International Space Station position, updated every 5 seconds</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🛰️ Satellite Coverage</h3>
+                        <p>40 satellites from Starlink, OneWeb, and GPS constellations shown as simple dots</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🌀 Hurricane Tracking</h3>
+                        <p>Shows active tropical storms when available (may be blocked by browser security)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔴 Earthquakes</h3>
+                        <p>Recent seismic activity (magnitude 2.5+) from the last 24 hours</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🏙️ Major Cities</h3>
+                        <p>32 major world cities with live weather and temperature. Click for details!</p>
                     </div>
                 </div>
             `;
@@ -380,28 +831,28 @@ function setupControls() {
         e.target.style.color = autoRotateEnabled ? 'white' : '';
     });
 
-    // City lights toggle - blend day/night textures
-    document.getElementById('toggleNightLights').addEventListener('click', (e) => {
-        nightLightsEnabled = !nightLightsEnabled;
-        e.target.textContent = nightLightsEnabled ? 'Lights: ON' : 'City Lights';
-        e.target.style.background = nightLightsEnabled ? '#2d5da1' : '';
-        e.target.style.color = nightLightsEnabled ? 'white' : '';
+    // Toggle cities
+    document.getElementById('toggleCities').addEventListener('click', function(e) {
+        citiesEnabled = !citiesEnabled;
+        this.classList.toggle('active', citiesEnabled);
+        console.log(`[CITIES] Toggled ${citiesEnabled ? 'ON' : 'OFF'}`);
+        updateHtmlElements();
+    });
 
-        if (globe) {
-            if (nightLightsEnabled) {
-                // Show night texture with city lights
-                globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
+    // Toggle hurricanes
+    document.getElementById('toggleHurricanes').addEventListener('click', function(e) {
+        hurricanesEnabled = !hurricanesEnabled;
+        this.classList.toggle('active', hurricanesEnabled);
+        console.log(`[HURRICANES] Toggled ${hurricanesEnabled ? 'ON' : 'OFF'}`);
+        updateHurricanes();
+    });
 
-                // Make night areas more visible with city lights
-                updateDayNightPolygons();
-            } else {
-                // Switch back to day texture
-                globe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
-
-                // Restore normal day/night coloring
-                updateDayNightPolygons();
-            }
-        }
+    // Toggle satellites
+    document.getElementById('toggleSatellites').addEventListener('click', function(e) {
+        satellitesEnabled = !satellitesEnabled;
+        this.classList.toggle('active', satellitesEnabled);
+        console.log(`[SATELLITES] Toggled ${satellitesEnabled ? 'ON' : 'OFF'}`);
+        updateSatellites();
     });
 
     // Close info panel

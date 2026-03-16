@@ -178,7 +178,8 @@ class RealtimeData {
      * Get size for earthquake magnitude
      */
     static getEarthquakeSize(magnitude) {
-        return Math.max(0.1, (magnitude - 2) * 0.15);
+        // Increased base size and multiplier for better visibility
+        return Math.max(0.3, (magnitude - 2) * 0.35);
     }
 
     /**

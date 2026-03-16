@@ -5,179 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌍 Real-Time Globe - Live Earth Explorer</title>
 
-    <!-- Hand-Drawn Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/globes/realtime/realtime-styles.css">
+    <link rel="stylesheet" href="/globes/realtime/realtime-styles-pro.css">
 </head>
 <body>
     <div class="page-container">
-        <!-- Back Button -->
-        <div class="back-link">
-            <a href="../../index.html">← Back to Globe Explorer</a>
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <a href="../../index.html" class="back-link-pro">
+                    <span>←</span>
+                    <span>Back to Explorer</span>
+                </a>
+                <div class="brand">
+                    <div class="brand-icon">🌍</div>
+                    <div class="brand-text">
+                        <h1>Real-Time Globe</h1>
+                        <p>Live Earth Data</p>
+                    </div>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="live-badge">
+                    <span class="pulse-dot"></span>
+                    <span>LIVE</span>
+                </div>
+                <div class="time-display" id="liveTime">--:--:-- UTC</div>
+            </div>
         </div>
-
-        <!-- Header -->
-        <header class="header">
-            <div class="title-badge">LIVE DATA</div>
-            <h1 class="main-title">🌍 Real-Time Globe</h1>
-            <p class="subtitle">Watch Earth as it happens! Day/night cycle, ISS tracker, live earthquakes & more</p>
-        </header>
 
         <!-- Main Content -->
         <div class="main-content">
             <!-- Globe Container -->
             <div class="globe-container">
                 <div id="globe"></div>
+            </div>
 
-                <!-- Live Status Banner -->
-                <div class="live-status">
-                    <span class="live-pulse">●</span>
-                    <span>LIVE</span>
-                    <span id="liveTime">--:--:-- UTC</span>
-                </div>
+            <!-- Stats Panel -->
+            <div class="stats-panel-pro panel-glass">
+                <div class="panel-title">Live Data</div>
 
-                <!-- Controls -->
-                <div class="controls">
-                    <button id="showInfo" class="btn-primary">ℹ️ Info</button>
-                    <button id="resetView" class="btn-secondary">Reset View</button>
-                    <button id="autoRotate" class="btn-secondary">Auto Rotate</button>
-                    <button id="toggleNightLights" class="btn-secondary">City Lights</button>
-                </div>
-
-                <!-- Live Stats Panel -->
-                <div class="live-stats-panel">
-                    <h4>Live Data</h4>
-
-                    <div class="stat-row">
-                        <div class="stat-mini">
-                            <span class="stat-mini-icon">🛰️</span>
-                            <div class="stat-mini-content">
-                                <div class="stat-mini-value" id="issAltitude">408 km</div>
-                                <div class="stat-mini-label">ISS Altitude</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row">
-                        <div class="stat-mini">
-                            <span class="stat-mini-icon">⚡</span>
-                            <div class="stat-mini-content">
-                                <div class="stat-mini-value" id="issSpeed">27,600 km/h</div>
-                                <div class="stat-mini-label">ISS Speed</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row">
-                        <div class="stat-mini">
-                            <span class="stat-mini-icon">🔴</span>
-                            <div class="stat-mini-content">
-                                <div class="stat-mini-value" id="earthquakeCount">--</div>
-                                <div class="stat-mini-label">Earthquakes Today</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row">
-                        <div class="stat-mini">
-                            <span class="stat-mini-icon">🌍</span>
-                            <div class="stat-mini-content">
-                                <div class="stat-mini-value" id="dayNightRatio">50/50</div>
-                                <div class="stat-mini-label">Day/Night Split</div>
-                            </div>
-                        </div>
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🛰️</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">ISS Altitude</div>
+                        <div class="stat-value-pro" id="issAltitude">408 km</div>
                     </div>
                 </div>
 
-                <!-- Legend -->
-                <div class="legend">
-                    <h4>Key</h4>
-                    <div class="legend-item">
-                        <span class="legend-icon">🛰️</span>
-                        <span>ISS</span>
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">⚡</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">ISS Speed</div>
+                        <div class="stat-value-pro" id="issSpeed">27,600 km/h</div>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-icon">🔴</span>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🔴</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Earthquakes (24h)</div>
+                        <div class="stat-value-pro" id="earthquakeCount">--</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🛰️</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Satellites</div>
+                        <div class="stat-value-pro" id="satellitesCount">40</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🌀</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Active Storms</div>
+                        <div class="stat-value-pro" id="stormsCount" style="opacity: 0.6;" title="NOAA API blocked by CORS">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🏙️</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Major Cities</div>
+                        <div class="stat-value-pro" id="citiesCount">32</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-pro">
+                    <div class="stat-icon-pro">🌍</div>
+                    <div class="stat-content-pro">
+                        <div class="stat-label-pro">Day/Night Split</div>
+                        <div class="stat-value-pro" id="dayNightRatio">50/50</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend Panel -->
+            <div class="legend-panel-pro panel-glass">
+                <div class="legend-title">Legend</div>
+                <div class="legend-items">
+                    <div class="legend-item-pro">
+                        <span style="font-size: 20px;">🛰️</span>
+                        <span>ISS Tracker</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: #00D9FF;"></div>
+                        <span>Starlink Satellites</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: #FFD700;"></div>
+                        <span>OneWeb Satellites</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: #00FF00;"></div>
+                        <span>GPS Satellites</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <span style="font-size: 20px;">🌀</span>
+                        <span>Hurricanes/Storms</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <span style="font-size: 20px;">🔴</span>
                         <span>Earthquakes</span>
                     </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: rgba(20, 30, 70, 0.5);"></span>
+                    <div class="legend-item-pro">
+                        <span style="font-size: 20px;">🏙️</span>
+                        <span>Major Cities</span>
+                    </div>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: rgba(5, 10, 35, 0.95); border-color: rgba(59, 130, 246, 0.3);"></div>
                         <span>Night</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: rgba(255, 140, 70, 0.5);"></span>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: rgba(255, 120, 50, 0.9); border-color: rgba(255, 120, 50, 0.5);"></div>
                         <span>Twilight</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: rgba(255, 255, 255, 0.3);"></span>
+                    <div class="legend-item-pro">
+                        <div class="legend-color-box" style="background: rgba(255, 250, 200, 0.6); border-color: rgba(255, 200, 0, 0.4);"></div>
                         <span>Day</span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Info Panel (Overlay) -->
-        <div class="info-panel" id="infoPanel">
-                <div class="thumbtack"></div>
-                <button class="close-panel" id="closePanel">✕</button>
+            <!-- Controls -->
+            <div class="controls-panel-pro">
+                <button id="showInfo" class="btn-pro">
+                    <span>ℹ️</span>
+                    <span>Info</span>
+                </button>
+                <button id="resetView" class="btn-pro">
+                    <span>🔄</span>
+                    <span>Reset</span>
+                </button>
+                <button id="autoRotate" class="btn-pro">
+                    <span>🔁</span>
+                    <span>Rotate</span>
+                </button>
+                <button id="toggleCities" class="btn-pro active">
+                    <span>🏙️</span>
+                    <span>Cities</span>
+                </button>
+                <button id="toggleSatellites" class="btn-pro active">
+                    <span>🛰️</span>
+                    <span>Satellites</span>
+                </button>
+                <button id="toggleHurricanes" class="btn-pro">
+                    <span>🌀</span>
+                    <span>Storms</span>
+                </button>
+            </div>
 
+            <!-- Info Panel -->
+            <div class="info-panel-pro panel-glass" id="infoPanel">
+                <div class="panel-header">
+                    <div class="panel-title">Information</div>
+                    <button class="close-btn-pro" id="closePanel">✕</button>
+                </div>
                 <div class="info-content">
                     <div class="info-header">
-                        <div class="icon-circle">🌍</div>
-                        <h2 class="info-title">Welcome to Real-Time Globe!</h2>
-                        <p class="info-subtitle">Live Earth Data Explorer</p>
+                        <h2 class="info-title">Welcome to Real-Time Globe</h2>
                     </div>
-
-                    <div class="info-body">
-                        <p class="hand-note">Hey there! 👋</p>
-                        <p>This globe shows Earth RIGHT NOW with:</p>
-
-                        <div class="feature-list">
-                            <div class="feature-item">
-                                <span class="check-mark">✓</span>
-                                <span><strong>Realistic lighting</strong> - dark blue = night, orange = twilight (dawn/dusk), bright = day</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="check-mark">✓</span>
-                                <span><strong>ISS tracker</strong> - live position updated every 5 seconds</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="check-mark">✓</span>
-                                <span><strong>Live earthquakes</strong> - magnitude 2.5+ from last 24 hours</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="check-mark">✓</span>
-                                <span><strong>City lights mode</strong> - toggle to see nighttime city lights</span>
-                            </div>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h3>🌍 Day/Night Cycle</h3>
+                            <p>Realistic lighting showing current day, night, and twilight zones across Earth</p>
                         </div>
-
-                        <div class="tip-box">
-                            <div class="tip-icon">💡</div>
-                            <p><strong>Tip:</strong> Click on the ISS or any earthquake to see details!</p>
+                        <div class="feature-card">
+                            <h3>🛰️ ISS Tracker</h3>
+                            <p>Live position of the International Space Station, updated every 5 seconds</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🛰️ Satellite Coverage</h3>
+                            <p>40 satellites from Starlink, OneWeb, and GPS constellations shown as simple dots</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🌀 Hurricane Tracking</h3>
+                            <p>Active tropical storms and hurricanes from NOAA (may be unavailable due to browser restrictions)</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🔴 Earthquakes</h3>
+                            <p>Recent seismic activity (magnitude 2.5+) from the last 24 hours</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🏙️ Major Cities</h3>
+                            <p>32 major world cities with live weather and temperature. Click for details!</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- Loading Screen -->
-    <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="pencil-sketch">
-                <div class="pencil">✏️</div>
-                <div class="sketch-line"></div>
-            </div>
-            <p>Drawing Earth in real-time...</p>
-            <div class="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
-            </div>
-        </div>
+    <div class="loading-pro" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Initializing Real-Time Globe</div>
+        <div class="loading-subtext">Loading live Earth data...</div>
     </div>
 
     <!-- Scripts -->
@@ -185,6 +230,9 @@
     <script src="/globes/realtime/sun-calculator.js"></script>
     <script src="/globes/realtime/day-night-shader.js"></script>
     <script src="/globes/realtime/realtime-data.js"></script>
+    <script src="/globes/realtime/cities-data.js"></script>
+    <script src="/globes/realtime/hurricanes-data.js"></script>
+    <script src="/globes/realtime/satellites-data.js"></script>
     <script src="/globes/realtime/realtime-globe.js"></script>
 </body>
 </html>

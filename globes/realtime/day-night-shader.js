@@ -99,9 +99,9 @@ class DayNightShader {
         const timeOfDay = this.getTimeOfDay(lat, lng);
 
         const colors = {
-            day: 'rgba(255, 255, 200, 0.1)',      // Slight warm tint
-            twilight: 'rgba(255, 150, 80, 0.4)',  // Orange/pink
-            night: 'rgba(20, 30, 50, 0.6)'        // Dark blue
+            day: 'rgba(255, 250, 200, 0.15)',     // Bright sunlight - warm yellow
+            twilight: 'rgba(255, 120, 50, 0.5)',  // Golden hour - vibrant orange
+            night: 'rgba(5, 10, 35, 0.85)'        // Deep night - dark navy blue
         };
 
         return colors[timeOfDay];
@@ -170,9 +170,9 @@ function applySimpleDayNight(globe, countries, sunPosition) {
 
         // Apply different colors
         const colors = {
-            day: 'rgba(255, 255, 255, 0.05)',
-            twilight: 'rgba(255, 120, 60, 0.3)',
-            night: 'rgba(20, 30, 60, 0.4)'
+            day: 'rgba(255, 250, 200, 0.15)',     // Bright sunlight - warm yellow
+            twilight: 'rgba(255, 120, 50, 0.5)',  // Golden hour - vibrant orange
+            night: 'rgba(5, 10, 35, 0.85)'        // Deep night - dark navy blue
         };
 
         feature.timeOfDay = timeOfDay;

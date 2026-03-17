@@ -198,13 +198,33 @@ class MoonCalculator {
         const nextFull = this.getNextFullMoon(date);
         const nextNew = this.getNextNewMoon(date);
 
+        // Calculate orbital velocity (approximate)
+        const orbitalVelocity = Math.round((2 * Math.PI * pos.distance) / (27.32 * 24)); // km/h
+
+        // Determine if waxing or waning
+        const isWaxing = pos.phaseValue < 0.5;
+
+        // Check if supermoon or micromoon
+        const avgDistance = 384400;
+        const distanceDiff = ((avgDistance - pos.distance) / avgDistance) * 100;
+        let moonType = 'Normal';
+        if (distanceDiff > 5) moonType = 'Supermoon';
+        else if (distanceDiff < -5) moonType = 'Micromoon';
+
+        // Apparent size compared to average
+        const apparentSize = (avgDistance / pos.distance) * 100;
+
         return {
             position: pos,
             emoji: this.getPhaseEmoji(pos.phaseValue),
             nextFullMoon: nextFull,
             nextNewMoon: nextNew,
             daysToFullMoon: Math.round((nextFull - date) / (24 * 60 * 60 * 1000)),
-            daysToNewMoon: Math.round((nextNew - date) / (24 * 60 * 60 * 1000))
+            daysToNewMoon: Math.round((nextNew - date) / (24 * 60 * 60 * 1000)),
+            orbitalVelocity: orbitalVelocity,
+            isWaxing: isWaxing,
+            moonType: moonType,
+            apparentSize: apparentSize.toFixed(1)
         };
     }
 }

@@ -71,11 +71,57 @@ function setupGlobe() {
         // Set initial view
         globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
 
+        // Setup camera listener to maintain constant label size
+        setupCameraScaling();
+
         console.log('[GLOBE] Setup complete');
     } catch (error) {
         console.error('[GLOBE] Setup error:', error);
         document.getElementById('loading').innerHTML =
             '<p style="color: red;">Error loading globe: ' + error.message + '</p>';
+    }
+}
+
+/**
+ * Setup camera scaling to keep labels constant size when zooming
+ */
+function setupCameraScaling() {
+    if (!globe) return;
+
+    // Monitor camera changes
+    globe.controls().addEventListener('change', () => {
+        updateLabelSizes();
+    });
+
+    // Initial update
+    updateLabelSizes();
+}
+
+/**
+ * Update label sizes based on camera distance
+ */
+function updateLabelSizes() {
+    if (!globe) return;
+
+    const camera = globe.camera();
+    if (!camera) return;
+
+    // Get camera distance from center (altitude)
+    const distance = camera.position.length();
+    const baseDistance = 250; // Base distance at initial view (altitude 2.5)
+
+    // Calculate scale factor (inverse of zoom)
+    // When zoomed in (smaller distance), make text smaller to appear same size
+    const scaleFactor = distance / baseDistance;
+
+    const newScaleFactor = Math.max(0.3, Math.min(scaleFactor, 3)); // Clamp between 0.3 and 3
+
+    // Only update if changed significantly (avoid constant redraws)
+    if (!window.labelScaleFactor || Math.abs(window.labelScaleFactor - newScaleFactor) > 0.05) {
+        window.labelScaleFactor = newScaleFactor;
+
+        // Trigger redraw of HTML elements with new scale
+        updateHtmlElements();
     }
 }
 
@@ -374,12 +420,27 @@ async function displayCities() {
 
     const cities = citiesData.getCitiesWithTime();
 
-    // Fetch weather for first batch of cities
+    // Display cities immediately (without weather)
+    citiesMarkers = cities;
+    updateCities();
+
+    // Update cities count to show loading status
+    const citiesCountEl = document.getElementById('citiesCount');
+    if (citiesCountEl) {
+        citiesCountEl.innerHTML = `<span style="opacity: 0.6;">⏳ Loading...</span>`;
+    }
+
+    // Fetch weather for cities with progress updates
     console.log('[CITIES] Fetching weather data...');
     await fetchCitiesWeather(cities);
 
     citiesMarkers = cities;
     updateCities();
+
+    // Update final count
+    if (citiesCountEl) {
+        citiesCountEl.textContent = cities.length;
+    }
 
     // Update weather every 15 minutes (less aggressive to avoid rate limits)
     setInterval(async () => {
@@ -409,6 +470,9 @@ async function displayCities() {
 async function fetchCitiesWeather(cities) {
     console.log('[WEATHER] Fetching weather for cities with rate limiting...');
 
+    const citiesCountEl = document.getElementById('citiesCount');
+    let loadedCount = 0;
+
     // Fetch one at a time with delays to avoid rate limits
     for (let i = 0; i < cities.length; i++) {
         const city = cities[i];
@@ -416,6 +480,18 @@ async function fetchCitiesWeather(cities) {
             const weather = await citiesData.fetchWeather(city);
             if (weather) {
                 city.weather = weather;
+                loadedCount++;
+
+                // Update progress counter
+                if (citiesCountEl) {
+                    citiesCountEl.innerHTML = `<span style="opacity: 0.8;">${loadedCount}/${cities.length}</span>`;
+                }
+
+                // Update display after every 5 cities to show progress
+                if (loadedCount % 5 === 0 || loadedCount === cities.length) {
+                    citiesMarkers = cities;
+                    updateCities();
+                }
             }
             // Wait 200ms between requests to respect rate limits
             await new Promise(resolve => setTimeout(resolve, 200));
@@ -424,6 +500,10 @@ async function fetchCitiesWeather(cities) {
             // Continue with other cities even if one fails
         }
     }
+
+    // Final update
+    citiesMarkers = cities;
+    updateCities();
 
     console.log('[WEATHER] ✓ Weather fetching complete');
 }
@@ -490,9 +570,12 @@ function updateHtmlElements() {
             const el = document.createElement('div');
             el.style.pointerEvents = 'auto';
 
+            // Get scale factor for constant size labels
+            const scaleFactor = window.labelScaleFactor || 1;
+
             if (d.type === 'moon') {
                 el.innerHTML = currentMoonData.emoji;
-                el.style.fontSize = '40px';
+                el.style.fontSize = `${40 * scaleFactor}px`;
                 el.style.cursor = 'pointer';
                 el.style.textShadow = '0 0 30px rgba(255,255,200,0.9), 0 0 15px rgba(255,255,255,0.6), 2px 2px 6px rgba(0,0,0,0.8)';
                 el.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
@@ -500,7 +583,7 @@ function updateHtmlElements() {
                 el.onclick = () => showMoonInfo();
             } else if (d.type === 'iss') {
                 el.innerHTML = '🛰️';
-                el.style.fontSize = '24px';
+                el.style.fontSize = `${24 * scaleFactor}px`;
                 el.style.cursor = 'pointer';
                 el.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
                 el.title = 'International Space Station';
@@ -509,7 +592,7 @@ function updateHtmlElements() {
                 const city = d.data;
                 el.style.cssText = `
                     color: ${city.isDaytime ? '#FFD700' : '#87CEEB'};
-                    font-size: 12px;
+                    font-size: ${10 * scaleFactor}px;
                     font-weight: 600;
                     text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8);
                     pointer-events: auto;
@@ -523,6 +606,9 @@ function updateHtmlElements() {
                     text = `${city.name} ${city.weather.emoji} ${city.weather.temp}°`;
                 } else if (city.weather && city.weather.temp !== undefined) {
                     text = `${city.name} 🌍 ${city.weather.temp}°`;
+                } else {
+                    // Show loading indicator while weather is being fetched
+                    text = `${city.name} ⏳`;
                 }
 
                 el.textContent = text;
@@ -852,42 +938,136 @@ function showMoonInfo() {
     const nextFull = currentMoonData.nextFullMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const nextNew = currentMoonData.nextNewMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+    const moonTypeEmoji = currentMoonData.moonType === 'Supermoon' ? '🌕✨' :
+                          currentMoonData.moonType === 'Micromoon' ? '🌕💫' : '🌕';
+    const phaseDirection = currentMoonData.isWaxing ? '↗️ Waxing' : '↘️ Waning';
+
     content.innerHTML = `
         <div class="info-header">
             <div class="icon-circle">${currentMoonData.emoji}</div>
             <h2 class="info-title">The Moon</h2>
-            <p class="info-subtitle">${pos.phase}</p>
+            <p class="info-subtitle">${pos.phase} · ${phaseDirection}</p>
         </div>
         <div class="feature-grid">
             <div class="feature-card">
                 <h3>${currentMoonData.emoji} Current Phase</h3>
-                <p style="font-size: 24px; font-weight: bold;">${pos.phase}</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">${pos.illumination.toFixed(1)}% illuminated</p>
+                <p style="font-size: 20px; font-weight: bold;">${pos.phase}</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">${pos.illumination.toFixed(1)}% illuminated · ${phaseDirection}</p>
             </div>
             <div class="feature-card">
                 <h3>🌍 Distance from Earth</h3>
-                <p style="font-size: 24px; font-weight: bold;">${MoonCalculator.formatDistance(pos.distance)}</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Average: 384,400 km</p>
+                <p style="font-size: 20px; font-weight: bold;">${MoonCalculator.formatDistance(pos.distance)}</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Avg: 384,400 km</p>
             </div>
             <div class="feature-card">
-                <h3>📍 Current Position</h3>
-                <p>${pos.lat.toFixed(2)}°, ${pos.lng.toFixed(2)}°</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Orbital position</p>
+                <h3>${moonTypeEmoji} Moon Type</h3>
+                <p style="font-size: 18px; font-weight: bold;">${currentMoonData.moonType}</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">${currentMoonData.apparentSize}% of avg size</p>
             </div>
             <div class="feature-card">
-                <h3>🌕 Next Full Moon</h3>
-                <p style="font-size: 18px; font-weight: bold;">${nextFull}</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">In ${currentMoonData.daysToFullMoon} days</p>
-            </div>
-            <div class="feature-card">
-                <h3>🌑 Next New Moon</h3>
-                <p style="font-size: 18px; font-weight: bold;">${nextNew}</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">In ${currentMoonData.daysToNewMoon} days</p>
+                <h3>⚡ Orbital Velocity</h3>
+                <p style="font-size: 20px; font-weight: bold;">${currentMoonData.orbitalVelocity.toLocaleString()} km/h</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Around Earth</p>
             </div>
             <div class="feature-card">
                 <h3>🌙 Moon Age</h3>
-                <p style="font-size: 24px; font-weight: bold;">${pos.age.toFixed(1)} days</p>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">Lunar cycle: 29.5 days</p>
+                <p style="font-size: 20px; font-weight: bold;">${pos.age.toFixed(1)} days</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Cycle: 29.5 days</p>
+            </div>
+            <div class="feature-card">
+                <h3>📍 Orbital Position</h3>
+                <p style="font-size: 16px; font-weight: bold;">${pos.lat.toFixed(2)}°, ${pos.lng.toFixed(2)}°</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Current coords</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌕 Next Full Moon</h3>
+                <p style="font-size: 16px; font-weight: bold;">${nextFull}</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">In ${currentMoonData.daysToFullMoon} days</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌑 Next New Moon</h3>
+                <p style="font-size: 16px; font-weight: bold;">${nextNew}</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">In ${currentMoonData.daysToNewMoon} days</p>
+            </div>
+        </div>
+        <div style="margin-top: 12px; padding: 12px 14px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 8px;">
+            <p style="font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.85);">
+                <strong style="color: #3b82f6;">💡 Did you know?</strong> The Moon moves away from Earth at 3.8 cm/year!
+                ${currentMoonData.moonType === 'Supermoon' ? ' Tonight it appears 14% larger and 30% brighter!' : ''}
+                ${currentMoonData.moonType === 'Micromoon' ? ' Tonight it appears 14% smaller than usual.' : ''}
+                Tidal locking means the same side always faces Earth.
+            </p>
+        </div>
+
+        <h3 style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); margin-top: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Physical Properties</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🌑 Diameter</h3>
+                <p style="font-size: 18px; font-weight: bold;">3,474 km</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">27% of Earth</p>
+            </div>
+            <div class="feature-card">
+                <h3>⚖️ Mass</h3>
+                <p style="font-size: 18px; font-weight: bold;">7.35 × 10²² kg</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">1.2% of Earth</p>
+            </div>
+            <div class="feature-card">
+                <h3>🪐 Surface Gravity</h3>
+                <p style="font-size: 18px; font-weight: bold;">1.62 m/s²</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">16.5% of Earth</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌡️ Surface Temp</h3>
+                <p style="font-size: 18px; font-weight: bold;">-173°C to 127°C</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Day/Night range</p>
+            </div>
+        </div>
+
+        <h3 style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); margin-top: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Orbital Data</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🔄 Synodic Period</h3>
+                <p style="font-size: 18px; font-weight: bold;">29.53 days</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Phase to phase</p>
+            </div>
+            <div class="feature-card">
+                <h3>🌀 Sidereal Period</h3>
+                <p style="font-size: 18px; font-weight: bold;">27.32 days</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">One full orbit</p>
+            </div>
+            <div class="feature-card">
+                <h3>📐 Orbital Inclination</h3>
+                <p style="font-size: 18px; font-weight: bold;">5.14°</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">To ecliptic plane</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎯 Eccentricity</h3>
+                <p style="font-size: 18px; font-weight: bold;">0.0549</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Nearly circular</p>
+            </div>
+        </div>
+
+        <h3 style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); margin-top: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Exploration</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🚀 First Landing</h3>
+                <p style="font-size: 16px; font-weight: bold;">July 20, 1969</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Apollo 11 mission</p>
+            </div>
+            <div class="feature-card">
+                <h3>👨‍🚀 Astronauts</h3>
+                <p style="font-size: 18px; font-weight: bold;">12 people</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Walked on Moon</p>
+            </div>
+            <div class="feature-card">
+                <h3>🛰️ Current Missions</h3>
+                <p style="font-size: 16px; font-weight: bold;">Multiple orbiters</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Active research</p>
+            </div>
+            <div class="feature-card">
+                <h3>🏗️ Future Plans</h3>
+                <p style="font-size: 16px; font-weight: bold;">Artemis Program</p>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 3px;">Return by 2026</p>
             </div>
         </div>
     `;

@@ -106,7 +106,12 @@ class CitiesData {
             // Open-Meteo API (free, no API key)
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m,weathercode&timezone=auto`;
 
-            const response = await fetch(url);
+            // Add timeout to prevent hanging
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
             // Handle rate limiting gracefully
             if (response.status === 429) {
@@ -138,7 +143,11 @@ class CitiesData {
 
             return weather;
         } catch (error) {
-            console.error(`[WEATHER] Failed for ${city.name}:`, error);
+            if (error.name === 'AbortError') {
+                console.warn(`[WEATHER] Timeout for ${city.name} - skipping`);
+            } else {
+                console.error(`[WEATHER] Failed for ${city.name}:`, error.message);
+            }
             return null;
         }
     }

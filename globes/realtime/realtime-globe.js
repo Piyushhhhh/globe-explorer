@@ -427,17 +427,21 @@ async function displayCities() {
     // Update cities count to show loading status
     const citiesCountEl = document.getElementById('citiesCount');
     if (citiesCountEl) {
-        citiesCountEl.innerHTML = `<span style="opacity: 0.6;">⏳ Loading...</span>`;
+        citiesCountEl.innerHTML = `<span style="opacity: 0.6;">⏳ ${cities.length}</span>`;
     }
 
     // Fetch weather for cities with progress updates
     console.log('[CITIES] Fetching weather data...');
-    await fetchCitiesWeather(cities);
+    try {
+        await fetchCitiesWeather(cities);
+    } catch (error) {
+        console.error('[CITIES] Weather fetch failed:', error);
+    }
 
     citiesMarkers = cities;
     updateCities();
 
-    // Update final count
+    // Update final count (always update, whether weather loaded or not)
     if (citiesCountEl) {
         citiesCountEl.textContent = cities.length;
     }
@@ -473,39 +477,53 @@ async function fetchCitiesWeather(cities) {
     const citiesCountEl = document.getElementById('citiesCount');
     let loadedCount = 0;
 
-    // Fetch one at a time with delays to avoid rate limits
-    for (let i = 0; i < cities.length; i++) {
-        const city = cities[i];
-        try {
-            const weather = await citiesData.fetchWeather(city);
-            if (weather) {
-                city.weather = weather;
-                loadedCount++;
+    // Set overall timeout for weather fetching (30 seconds max)
+    const overallTimeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Overall weather fetch timeout')), 30000)
+    );
 
-                // Update progress counter
-                if (citiesCountEl) {
-                    citiesCountEl.innerHTML = `<span style="opacity: 0.8;">${loadedCount}/${cities.length}</span>`;
-                }
+    try {
+        await Promise.race([
+            (async () => {
+                // Fetch one at a time with delays to avoid rate limits
+                for (let i = 0; i < cities.length; i++) {
+                    const city = cities[i];
+                    try {
+                        const weather = await citiesData.fetchWeather(city);
+                        if (weather) {
+                            city.weather = weather;
+                            loadedCount++;
 
-                // Update display after every 5 cities to show progress
-                if (loadedCount % 5 === 0 || loadedCount === cities.length) {
-                    citiesMarkers = cities;
-                    updateCities();
+                            // Update progress counter
+                            if (citiesCountEl) {
+                                citiesCountEl.innerHTML = `<span style="opacity: 0.8;">⏳ ${loadedCount}/${cities.length}</span>`;
+                            }
+
+                            // Update display after every 5 cities to show progress
+                            if (loadedCount % 5 === 0 || loadedCount === cities.length) {
+                                citiesMarkers = cities;
+                                updateCities();
+                            }
+                        }
+                        // Wait 200ms between requests to respect rate limits
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    } catch (error) {
+                        console.warn(`[WEATHER] Failed for ${city.name}, skipping`);
+                        // Continue with other cities even if one fails
+                    }
                 }
-            }
-            // Wait 200ms between requests to respect rate limits
-            await new Promise(resolve => setTimeout(resolve, 200));
-        } catch (error) {
-            console.warn(`[WEATHER] Failed for ${city.name}, skipping`);
-            // Continue with other cities even if one fails
-        }
+            })(),
+            overallTimeout
+        ]);
+    } catch (error) {
+        console.warn('[WEATHER] Overall timeout reached, stopping weather fetch');
     }
 
     // Final update
     citiesMarkers = cities;
     updateCities();
 
-    console.log('[WEATHER] ✓ Weather fetching complete');
+    console.log(`[WEATHER] ✓ Weather fetching complete (${loadedCount}/${cities.length} succeeded)`);
 }
 
 /**

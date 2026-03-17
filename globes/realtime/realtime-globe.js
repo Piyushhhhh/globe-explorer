@@ -1112,10 +1112,6 @@ function setupControls() {
                         <p>40 satellites from Starlink, OneWeb, and GPS constellations</p>
                     </div>
                     <div class="feature-card">
-                        <h3>🌀 Hurricane Tracking</h3>
-                        <p>Shows active tropical storms when available (may be blocked by browser security)</p>
-                    </div>
-                    <div class="feature-card">
                         <h3>🔴 Earthquakes</h3>
                         <p>Recent seismic activity (magnitude 2.5+) from the last 24 hours</p>
                     </div>
@@ -1162,14 +1158,6 @@ function setupControls() {
         updateHtmlElements();
     });
 
-    // Toggle hurricanes
-    document.getElementById('toggleHurricanes').addEventListener('click', function(e) {
-        hurricanesEnabled = !hurricanesEnabled;
-        this.classList.toggle('active', hurricanesEnabled);
-        console.log(`[HURRICANES] Toggled ${hurricanesEnabled ? 'ON' : 'OFF'}`);
-        updateHurricanes();
-    });
-
     // Toggle satellites
     document.getElementById('toggleSatellites').addEventListener('click', function(e) {
         satellitesEnabled = !satellitesEnabled;
@@ -1184,6 +1172,41 @@ function setupControls() {
         panel.style.display = 'none';
         panel.classList.remove('visible');
     });
+
+    // Legend panel toggle functionality
+    const legendPanel = document.getElementById('legendPanel');
+    const legendToggleBtn = document.getElementById('toggleLegend');
+    const closeLegendBtn = document.getElementById('closeLegend');
+
+    if (legendPanel && legendToggleBtn && closeLegendBtn) {
+        // Close legend
+        closeLegendBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[LEGEND] Close button clicked');
+            legendPanel.classList.add('collapsed');
+            legendToggleBtn.classList.add('visible');
+            console.log('[LEGEND] Panel collapsed - classes added');
+        });
+
+        // Open legend
+        legendToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[LEGEND] Toggle button clicked');
+            legendPanel.classList.remove('collapsed');
+            legendToggleBtn.classList.remove('visible');
+            console.log('[LEGEND] Panel opened - classes removed');
+        });
+
+        console.log('[LEGEND] Toggle controls initialized successfully');
+    } else {
+        console.error('[LEGEND] Failed to find legend elements:', {
+            legendPanel: !!legendPanel,
+            legendToggleBtn: !!legendToggleBtn,
+            closeLegendBtn: !!closeLegendBtn
+        });
+    }
 
     console.log('[CONTROLS] All controls initialized');
 }

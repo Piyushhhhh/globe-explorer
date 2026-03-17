@@ -119,7 +119,8 @@
             </div>
 
             <!-- Legend Panel -->
-            <div class="legend-panel-pro panel-glass">
+            <div class="legend-panel-pro panel-glass" id="legendPanel">
+                <button class="legend-close-btn" id="closeLegend" title="Close Legend">×</button>
                 <!-- Space Objects -->
                 <div class="legend-section">
                     <div class="legend-section-title">Space Objects</div>
@@ -166,10 +167,6 @@
                             <span style="font-size: 18px;">🔴</span>
                             <span>Earthquakes</span>
                         </div>
-                        <div class="legend-item-pro">
-                            <span style="font-size: 18px;">🌀</span>
-                            <span>Storms</span>
-                        </div>
                     </div>
                 </div>
 
@@ -192,6 +189,13 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Legend Toggle Button (when collapsed) -->
+            <button class="legend-toggle-btn" id="toggleLegend" title="Show Legend">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
 
             <!-- Controls -->
             <div class="controls-panel-pro">
@@ -218,10 +222,6 @@
                 <button id="toggleSatellites" class="btn-pro active">
                     <span>🛰️</span>
                     <span>Satellites</span>
-                </button>
-                <button id="toggleHurricanes" class="btn-pro">
-                    <span>🌀</span>
-                    <span>Storms</span>
                 </button>
             </div>
 

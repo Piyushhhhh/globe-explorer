@@ -30,26 +30,83 @@
                     <button id="resetView">Reset View</button>
                     <button id="autoRotate">Auto Rotate</button>
                 </div>
+
+                <!-- Stats Dashboard (Left Side) -->
+                <div class="stats-dashboard">
+                    <h4>📊 Global Overview</h4>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏛️</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalSitesValue">0</div>
+                            <div class="stat-label">Ancient Sites</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👑</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="civilizationsCount">0</div>
+                            <div class="stat-label">Civilizations</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏺</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="unescoCount">0</div>
+                            <div class="stat-label">UNESCO Sites</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="timespanValue">0</div>
+                            <div class="stat-label">Years Covered</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 2px dashed rgba(45,45,45,0.2);">
+                        <h4 style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;">🌍 By Civilization</h4>
+                        <div id="civilizationsList" style="max-height: 200px; overflow-y: auto; font-size: 11px;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend Panel (Right Side) -->
                 <div class="legend">
-                    <h4>Era Filter</h4>
-                    <div class="legend-item" data-filter="all">
+                    <h4>⏳ Era Filter</h4>
+                    <div class="legend-item active" data-filter="all">
                         <span class="legend-color" style="background: linear-gradient(135deg, #d4af37, #aa8c30);"></span>
-                        <span>All Sites</span>
+                        <span>All Eras</span>
                     </div>
                     <div class="legend-item" data-filter="ancient">
                         <span class="legend-color" style="background: #cd7f32;"></span>
-                        <span>Ancient (3000 BCE - 500 CE)</span>
+                        <span>Ancient (3000-500 BCE)</span>
                     </div>
                     <div class="legend-item" data-filter="classical">
                         <span class="legend-color" style="background: #b87333;"></span>
-                        <span>Classical (500 BCE - 500 CE)</span>
+                        <span>Classical (500 BCE-500 CE)</span>
                     </div>
                     <div class="legend-item" data-filter="medieval">
                         <span class="legend-color" style="background: #8b6914;"></span>
-                        <span>Medieval (500 - 1500 CE)</span>
+                        <span>Medieval (500-1500 CE)</span>
                     </div>
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 2px dashed #2d2d2d; font-size: 11px; opacity: 0.8; line-height: 1.4;">
-                        Click any ancient site to explore its history
+
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 2px dashed rgba(45,45,45,0.2);">
+                        <h4 style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;">🎯 Site Types</h4>
+                        <div id="siteTypesList" style="font-size: 11px;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Panel (Bottom Right) -->
+                <div class="insights-panel">
+                    <div class="insights-header">
+                        <span>💡 Did You Know?</span>
+                        <button class="insights-next" id="nextInsight">→</button>
+                    </div>
+                    <div class="insights-content" id="insightsContent">
+                        Loading insights...
                     </div>
                 </div>
             </div>

@@ -593,22 +593,9 @@ function initControls() {
     });
 }
 
-// Update stats and populate dashboard
+// Update stats
 function updateStats() {
-    // Basic stats
-    document.getElementById('totalSitesValue').textContent = ancientSites.length;
     document.getElementById('totalSites').textContent = ancientSites.length + '+';
-
-    // Count unique civilizations
-    const civilizations = [...new Set(ancientSites.map(s => s.civilization))];
-    document.getElementById('civilizationsCount').textContent = civilizations.length;
-
-    // Count UNESCO sites
-    const unescoSites = ancientSites.filter(s => s.unesco).length;
-    document.getElementById('unescoCount').textContent = unescoSites;
-
-    // Calculate timespan
-    document.getElementById('timespanValue').textContent = '5,000+';
 
     // Find oldest site
     const oldestSites = ancientSites.filter(s =>
@@ -619,120 +606,6 @@ function updateStats() {
     }
 
     document.getElementById('tradeRoutes').textContent = tradeRoutes.length;
-
-    // Populate civilizations list
-    populateCivilizationsList();
-
-    // Populate site types
-    populateSiteTypes();
-
-    // Initialize insights carousel
-    initInsights();
-}
-
-// Populate civilizations breakdown
-function populateCivilizationsList() {
-    const civilizationCounts = {};
-
-    ancientSites.forEach(site => {
-        const civ = site.civilization;
-        civilizationCounts[civ] = (civilizationCounts[civ] || 0) + 1;
-    });
-
-    // Sort by count descending
-    const sorted = Object.entries(civilizationCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 15); // Top 15
-
-    const container = document.getElementById('civilizationsList');
-    container.innerHTML = sorted.map(([civ, count]) => `
-        <div class="civ-item" data-civ="${civ}">
-            <span class="civ-name">${civ}</span>
-            <span class="civ-count">${count}</span>
-        </div>
-    `).join('');
-
-    // Add click handlers to filter by civilization
-    container.querySelectorAll('.civ-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const civ = item.dataset.civ;
-            filterByCivilization(civ);
-        });
-    });
-}
-
-// Populate site types
-function populateSiteTypes() {
-    const typeCounts = {};
-
-    ancientSites.forEach(site => {
-        const type = site.type;
-        typeCounts[type] = (typeCounts[type] || 0) + 1;
-    });
-
-    const sorted = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]);
-
-    const container = document.getElementById('siteTypesList');
-    container.innerHTML = sorted.map(([type, count]) => `
-        <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px;">
-            <span>${type}</span>
-            <span style="font-weight: 700; color: #8b6914;">${count}</span>
-        </div>
-    `).join('');
-}
-
-// Filter by civilization
-function filterByCivilization(civilization) {
-    console.log('Filtering by civilization:', civilization);
-    // TODO: Implement filtering logic
-    // For now, just highlight the sites
-    globe.htmlElementsData(ancientSites.filter(s => s.civilization === civilization));
-}
-
-// Initialize insights carousel
-let currentInsightIndex = 0;
-const insights = [
-    "🏛️ The Great Pyramid of Giza was the world's tallest structure for 3,800 years!",
-    "📜 The Library of Alexandria held over 400,000 ancient scrolls before its destruction.",
-    "🗿 Petra's Treasury was carved from a single rock face - it's not a building, it's sculpture!",
-    "⛰️ Machu Picchu sits at 2,430 meters altitude and was unknown to the outside world until 1911.",
-    "🏺 Pompeii was perfectly preserved under volcanic ash for 1,700 years.",
-    "👑 The Terracotta Army contains over 8,000 unique soldier statues - each with different faces!",
-    "🌊 Angkor Wat is the largest religious monument in the world, covering 162 hectares.",
-    "🔺 Egyptian pyramids were covered in smooth white limestone that reflected sunlight like mirrors.",
-    "📍 The Silk Road connected China to the Mediterranean over 7,000 miles.",
-    "🏛️ The Roman Colosseum could seat 50,000 spectators and had a complex underground system.",
-    "🗿 Stonehenge's largest stones weigh 25 tons and were transported 150 miles!",
-    "👁️ The Great Sphinx is 73 meters long and carved from a single limestone ridge.",
-    "🏺 Mesa Verde's cliff dwellings were mysteriously abandoned around 1300 CE.",
-    "⚱️ The Dead Sea Scrolls are the oldest known biblical manuscripts, dating to 200 BCE.",
-    "🌴 Babylon's Hanging Gardens may have never existed - no archaeological evidence found!"
-];
-
-function initInsights() {
-    showInsight(0);
-
-    document.getElementById('nextInsight').addEventListener('click', () => {
-        currentInsightIndex = (currentInsightIndex + 1) % insights.length;
-        showInsight(currentInsightIndex);
-    });
-
-    // Auto-rotate insights every 10 seconds
-    setInterval(() => {
-        currentInsightIndex = (currentInsightIndex + 1) % insights.length;
-        showInsight(currentInsightIndex);
-    }, 10000);
-}
-
-function showInsight(index) {
-    const container = document.getElementById('insightsContent');
-    container.style.opacity = '0';
-
-    setTimeout(() => {
-        container.textContent = insights[index];
-        container.style.transition = 'opacity 0.3s ease';
-        container.style.opacity = '1';
-    }, 150);
 }
 
 // Initialize everything when DOM is ready

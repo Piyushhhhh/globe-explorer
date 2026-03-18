@@ -549,6 +549,12 @@ function filterByPeriod(period) {
         }
     });
 
+    // Reset civilization filter
+    const civFilter = document.getElementById('civilizationFilter');
+    if (civFilter) {
+        civFilter.value = 'all';
+    }
+
     // Re-add the sites with proper rendering
     addAncientSites();
 }
@@ -590,6 +596,39 @@ function initControls() {
             const filter = item.dataset.filter;
             filterByPeriod(filter);
         });
+    });
+
+    // Populate civilization dropdown
+    populateCivilizationFilter();
+
+    // Civilization filter
+    document.getElementById('civilizationFilter').addEventListener('change', (e) => {
+        const civilization = e.target.value;
+        if (civilization === 'all') {
+            // Show all sites (respecting current period filter)
+            if (currentFilter === 'all') {
+                globe.htmlElementsData(ancientSites);
+            } else {
+                filterByPeriod(currentFilter);
+            }
+        } else {
+            // Filter by civilization
+            const filtered = ancientSites.filter(site => site.civilization === civilization);
+            globe.htmlElementsData(filtered);
+        }
+    });
+}
+
+// Populate civilization filter dropdown
+function populateCivilizationFilter() {
+    const civilizations = [...new Set(ancientSites.map(s => s.civilization))].sort();
+    const select = document.getElementById('civilizationFilter');
+
+    civilizations.forEach(civ => {
+        const option = document.createElement('option');
+        option.value = civ;
+        option.textContent = civ;
+        select.appendChild(option);
     });
 }
 

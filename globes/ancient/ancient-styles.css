@@ -584,3 +584,20 @@ footer {
     font-size: 24px;
     transform: rotate(15deg);
 }
+
+/* Civilization Filter Dropdown */
+#civilizationFilter {
+    transition: all 0.2s ease;
+}
+
+#civilizationFilter:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+}
+
+#civilizationFilter:focus {
+    outline: none;
+    background: rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}

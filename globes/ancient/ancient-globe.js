@@ -5,6 +5,8 @@ let selectedSite = null;
 let currentFilter = 'all';
 let currentHoveredMarker = null;
 let currentTimelineYear = 1500; // Default to showing all sites
+let connectionArcs = [];
+let highlightedRoutes = [];
 
 // Initialize the globe
 function initGlobe() {
@@ -27,8 +29,8 @@ function initGlobe() {
     // Load initial data
     updateSiteData(ancientSites);
 
-    // Add trade routes
-    addTradeRoutes();
+    // Initialize trade routes (will be updated when sites are clicked)
+    updateGlobeArcs();
 
     // Disable auto-rotation by default (user can enable via button)
     globe.controls().autoRotate = false;
@@ -203,6 +205,10 @@ function setupSiteRenderer() {
                 e.stopPropagation();
                 showSiteInfo(d);
                 selectedSite = d.name;
+
+                // Show visual connections
+                showSiteConnections(d);
+                highlightNearbyRoutes(d);
 
                 globe.pointOfView({
                     lat: d.lat,
@@ -826,6 +832,207 @@ function getContemporarySites(site) {
     }).slice(0, 5);
 }
 
+// Show visual connections from clicked site to related sites
+function showSiteConnections(site) {
+    // Clear previous connections
+    connectionArcs = [];
+
+    if (!site.relatedSites || site.relatedSites.length === 0) return;
+
+    // Create arcs to each related site
+    site.relatedSites.forEach((relatedName, index) => {
+        const relatedSite = ancientSites.find(s => s.name === relatedName);
+        if (relatedSite) {
+            connectionArcs.push({
+                startLat: site.lat,
+                startLng: site.lng,
+                endLat: relatedSite.lat,
+                endLng: relatedSite.lng,
+                color: '#d4af37',
+                name: `${site.name} → ${relatedSite.name}`,
+                isConnection: true
+            });
+        }
+    });
+
+    // Update globe with connection arcs
+    updateGlobeArcs();
+}
+
+// Highlight trade routes that pass near this site
+function highlightNearbyRoutes(site) {
+    highlightedRoutes = [];
+
+    // Check each trade route to see if it passes near this site
+    tradeRoutes.forEach(route => {
+        const isNearby = route.paths.some(path => {
+            // Check if route passes within ~500km of the site
+            const distToStart = calculateDistance(site.lat, site.lng, path.start.lat, path.start.lng);
+            const distToEnd = calculateDistance(site.lat, site.lng, path.end.lat, path.end.lng);
+            return distToStart < 500 || distToEnd < 500;
+        });
+
+        if (isNearby) {
+            highlightedRoutes.push(route.name);
+        }
+    });
+
+    updateGlobeArcs();
+}
+
+// Calculate distance between two points (rough approximation in km)
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// Update globe arcs (trade routes + connection arcs)
+function updateGlobeArcs() {
+    const allArcs = [];
+
+    // Add trade routes (with highlighting if relevant)
+    tradeRoutes.forEach(route => {
+        const isHighlighted = highlightedRoutes.includes(route.name);
+        route.paths.forEach(path => {
+            allArcs.push({
+                startLat: path.start.lat,
+                startLng: path.start.lng,
+                endLat: path.end.lat,
+                endLng: path.end.lng,
+                color: isHighlighted ? '#e6b800' : route.color,
+                name: route.name,
+                description: route.description,
+                routeData: route,
+                isHighlighted: isHighlighted,
+                isConnection: false
+            });
+        });
+    });
+
+    // Add connection arcs
+    connectionArcs.forEach(arc => {
+        allArcs.push(arc);
+    });
+
+    globe.arcsData(allArcs)
+        .arcColor('color')
+        .arcStroke(d => d.isHighlighted ? 2.5 : (d.isConnection ? 2.0 : 1.2))
+        .arcDashLength(d => d.isConnection ? 0.8 : 0.4)
+        .arcDashGap(d => d.isConnection ? 0.2 : 0.15)
+        .arcDashAnimateTime(d => d.isConnection ? 1500 : 2500)
+        .arcAltitude(d => d.isConnection ? 0.3 : 0.15)
+        .arcLabel(d => {
+            if (d.isConnection) {
+                return `<div style="
+                    background: linear-gradient(135deg, rgba(212, 175, 55, 0.98), rgba(170, 140, 48, 0.98));
+                    padding: 8px 12px;
+                    border-radius: 10px;
+                    border: 2px solid #d4af37;
+                    font-family: 'Patrick Hand', cursive;
+                    color: white;
+                    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+                    backdrop-filter: blur(10px);
+                    font-size: 12px;
+                    font-weight: bold;
+                ">
+                    🔗 Related: ${d.name}
+                </div>`;
+            } else if (d.isHighlighted) {
+                return `<div style="
+                    background: linear-gradient(135deg, rgba(230, 184, 0, 0.98), rgba(212, 175, 55, 0.98));
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    border: 3px solid #e6b800;
+                    font-family: 'Patrick Hand', cursive;
+                    color: #2d2d2d;
+                    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+                    max-width: 250px;
+                    backdrop-filter: blur(10px);
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-weight: bold;
+                        font-size: 16px;
+                        margin-bottom: 6px;
+                        color: #8b6914;
+                    ">
+                        ⭐ ${d.routeData.icon} ${d.name}
+                    </div>
+                    <div style="font-size: 13px; line-height: 1.5; opacity: 0.9; margin-bottom: 6px;">
+                        ${d.description}
+                    </div>
+                    <div style="
+                        font-size: 11px;
+                        color: #8b6914;
+                        border-top: 1px solid rgba(139, 105, 20, 0.3);
+                        padding-top: 6px;
+                        margin-top: 6px;
+                        font-weight: bold;
+                    ">
+                        ✨ Connected to selected site
+                    </div>
+                </div>`;
+            } else {
+                return `<div style="
+                    background: linear-gradient(135deg, rgba(244, 232, 208, 0.98), rgba(232, 220, 192, 0.98));
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    border: 3px solid #8b6914;
+                    font-family: 'Patrick Hand', cursive;
+                    color: #2d2d2d;
+                    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+                    max-width: 250px;
+                    backdrop-filter: blur(10px);
+                    cursor: pointer;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-weight: bold;
+                        font-size: 16px;
+                        margin-bottom: 6px;
+                        color: #8b6914;
+                    ">
+                        ${d.routeData.icon} ${d.name}
+                    </div>
+                    <div style="font-size: 13px; line-height: 1.5; opacity: 0.9; margin-bottom: 6px;">
+                        ${d.description}
+                    </div>
+                    <div style="
+                        font-size: 11px;
+                        color: #d4af37;
+                        border-top: 1px solid rgba(139, 105, 20, 0.3);
+                        padding-top: 6px;
+                        margin-top: 6px;
+                    ">
+                        🖱️ Click for full details
+                    </div>
+                </div>`;
+            }
+        })
+        .onArcClick((arc) => {
+            if (arc && arc.routeData && !arc.isConnection) {
+                showRouteInfo(arc.routeData);
+                selectedSite = arc.name;
+            }
+        })
+        .onArcHover(arc => {
+            document.body.style.cursor = arc ? 'pointer' : 'default';
+        });
+}
+
+// Clear all visual connections
+function clearSiteConnections() {
+    connectionArcs = [];
+    highlightedRoutes = [];
+    updateGlobeArcs();
+}
+
 // Handle custom show site event from related/contemporary sites
 window.addEventListener('showSite', (e) => {
     const siteName = e.detail;
@@ -833,6 +1040,11 @@ window.addEventListener('showSite', (e) => {
     if (site) {
         showSiteInfo(site);
         selectedSite = site.name;
+
+        // Show visual connections
+        showSiteConnections(site);
+        highlightNearbyRoutes(site);
+
         globe.pointOfView({
             lat: site.lat,
             lng: site.lng,
@@ -953,6 +1165,7 @@ function initControls() {
     document.getElementById('closePanel').addEventListener('click', () => {
         document.getElementById('infoPanel').classList.add('hidden');
         selectedSite = null;
+        clearSiteConnections();
         globe.pointOfView({ altitude: 2.5 }, 1000);
     });
 
@@ -961,6 +1174,7 @@ function initControls() {
         if (e.key === 'Escape') {
             document.getElementById('infoPanel').classList.add('hidden');
             selectedSite = null;
+            clearSiteConnections();
         }
     });
 

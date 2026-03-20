@@ -20,8 +20,11 @@ function initGlobe() {
     // Set initial view
     globe.pointOfView({ altitude: 2.5 });
 
-    // Add ancient sites as markers
-    addAncientSites();
+    // Setup the HTML element renderer (only once)
+    setupSiteRenderer();
+
+    // Load initial data
+    updateSiteData(ancientSites);
 
     // Add trade routes
     addTradeRoutes();
@@ -42,11 +45,9 @@ function initGlobe() {
     }, 1500);
 }
 
-// Add ancient sites with prominent icon markers
-function addAncientSites() {
-    console.log(`Adding ${ancientSites.length} ancient sites with icon markers`);
-
-    globe.htmlElementsData(ancientSites)
+// Setup HTML element renderer (only called once)
+function setupSiteRenderer() {
+    globe
         .htmlLat('lat')
         .htmlLng('lng')
         .htmlAltitude(0)
@@ -211,6 +212,12 @@ function addAncientSites() {
 
             return el;
         });
+}
+
+// Update site data (call this when filtering)
+function updateSiteData(sites) {
+    console.log(`Updating to show ${sites.length} sites`);
+    globe.htmlElementsData(sites);
 }
 
 // Show route information panel
@@ -533,12 +540,15 @@ function getPeriodName(period) {
 function filterByPeriod(period) {
     currentFilter = period;
 
+    let sitesToShow;
     if (period === 'all') {
-        globe.htmlElementsData(ancientSites);
+        sitesToShow = ancientSites;
     } else {
-        const filtered = ancientSites.filter(site => site.period === period);
-        globe.htmlElementsData(filtered);
+        sitesToShow = ancientSites.filter(site => site.period === period);
     }
+
+    // Update markers with filtered data
+    updateSiteData(sitesToShow);
 
     // Update legend active state
     document.querySelectorAll('.legend-item').forEach(item => {
@@ -554,9 +564,6 @@ function filterByPeriod(period) {
     if (civFilter) {
         civFilter.value = 'all';
     }
-
-    // Re-add the sites with proper rendering
-    addAncientSites();
 }
 
 // Initialize controls
@@ -606,15 +613,17 @@ function initControls() {
         const civilization = e.target.value;
         if (civilization === 'all') {
             // Show all sites (respecting current period filter)
-            if (currentFilter === 'all') {
-                globe.htmlElementsData(ancientSites);
-            } else {
-                filterByPeriod(currentFilter);
-            }
+            filterByPeriod(currentFilter);
         } else {
-            // Filter by civilization
-            const filtered = ancientSites.filter(site => site.civilization === civilization);
-            globe.htmlElementsData(filtered);
+            // Filter by civilization (also respect era filter if active)
+            let filtered = ancientSites.filter(site => site.civilization === civilization);
+
+            // If era filter is active, also apply it
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(site => site.period === currentFilter);
+            }
+
+            updateSiteData(filtered);
         }
     });
 }

@@ -4,6 +4,7 @@ let globe;
 let selectedSite = null;
 let currentFilter = 'all';
 let currentHoveredMarker = null;
+let currentTimelineYear = 1500; // Default to showing all sites
 
 // Initialize the globe
 function initGlobe() {
@@ -420,28 +421,74 @@ function showSiteInfo(site) {
     const panel = document.getElementById('infoPanel');
     const content = document.getElementById('infoPanelContent');
 
-    // Default image if none provided - ancient ruins/archaeology theme
+    // Default image if none provided
     const imageUrl = site.image || 'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=600&q=80';
+
+    // Get contemporary sites
+    const contemporarySites = getContemporarySites(site);
 
     content.innerHTML = `
         <div class="info-header">
-            ${site.image ? `
+            <!-- Photo Gallery -->
+            ${site.images && site.images.length > 0 ? `
+                <div class="photo-gallery" style="position: relative; margin-bottom: 12px;">
+                    <div class="gallery-main" style="
+                        width: 100%;
+                        height: 200px;
+                        overflow: hidden;
+                        border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                        border: 3px solid #8b6914;
+                        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+                    ">
+                        <img id="galleryMainImg" src="${site.images[0]}" alt="${site.name}" style="
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            transition: opacity 0.3s ease;
+                        ">
+                    </div>
+                    <div class="gallery-thumbnails" style="
+                        display: flex;
+                        gap: 8px;
+                        margin-top: 8px;
+                        overflow-x: auto;
+                    ">
+                        ${site.images.map((img, i) => `
+                            <img src="${img}"
+                                 onclick="document.getElementById('galleryMainImg').src='${img}'"
+                                 style="
+                                    width: 60px;
+                                    height: 60px;
+                                    object-fit: cover;
+                                    border-radius: 12px 10px 13px 11px / 11px 13px 10px 12px;
+                                    border: 2px solid ${i === 0 ? '#d4af37' : '#8b6914'};
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    flex-shrink: 0;
+                                 "
+                                 onmouseover="this.style.transform='scale(1.1)'; this.style.borderColor='#d4af37'"
+                                 onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#8b6914'">
+                        `).join('')}
+                    </div>
+                </div>
+            ` : site.image ? `
                 <div style="
                     width: 100%;
-                    height: 180px;
+                    height: 200px;
                     overflow: hidden;
-                    border-radius: 15px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
                     margin-bottom: 12px;
                     border: 3px solid #8b6914;
-                    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+                    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
                 ">
                     <img src="${imageUrl}" alt="${site.name}" style="
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                    " onerror="this.src='https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=600&q=80'">
+                    ">
                 </div>
             ` : ''}
+
             <div class="site-icon">${site.icon || '🏛️'}</div>
             <h2 class="site-name">${site.name}</h2>
             <div class="site-period">${site.civilization} • ${site.founded}</div>
@@ -451,7 +498,7 @@ function showSiteInfo(site) {
             <div style="
                 padding: 12px;
                 background: rgba(255, 255, 255, 0.5);
-                border-radius: 15px;
+                border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
                 border: 2px solid #8b6914;
                 line-height: 1.6;
                 margin-bottom: 8px;
@@ -461,6 +508,88 @@ function showSiteInfo(site) {
                 </div>
             </div>
 
+            <!-- Did You Know -->
+            ${site.didYouKnow && site.didYouKnow.length > 0 ? `
+                <div style="
+                    background: rgba(212, 175, 55, 0.1);
+                    padding: 12px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                    border: 2px solid #d4af37;
+                    margin-bottom: 8px;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 16px;
+                        font-weight: 700;
+                        color: #8b6914;
+                        margin-bottom: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        💡 Did You Know?
+                    </div>
+                    <div style="font-size: 13px; line-height: 1.6; color: #2d2d2d;">
+                        ${site.didYouKnow.map(fact => `• ${fact}`).join('<br><br>')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Famous Artifacts -->
+            ${site.artifacts && site.artifacts.length > 0 ? `
+                <div style="
+                    background: rgba(205, 127, 50, 0.1);
+                    padding: 12px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                    border: 2px solid #cd7f32;
+                    margin-bottom: 8px;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 16px;
+                        font-weight: 700;
+                        color: #8b6914;
+                        margin-bottom: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🏺 Famous Artifacts
+                    </div>
+                    ${site.artifacts.map(artifact => `
+                        <div style="
+                            display: flex;
+                            gap: 10px;
+                            margin-bottom: 10px;
+                            padding: 8px;
+                            background: rgba(255, 255, 255, 0.5);
+                            border-radius: 12px 10px 13px 11px / 11px 13px 10px 12px;
+                            border: 2px solid #8b6914;
+                        ">
+                            ${artifact.image ? `
+                                <img src="${artifact.image}" style="
+                                    width: 60px;
+                                    height: 60px;
+                                    object-fit: cover;
+                                    border-radius: 8px;
+                                    border: 2px solid #8b6914;
+                                    flex-shrink: 0;
+                                ">
+                            ` : ''}
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 13px; color: #2d2d2d; margin-bottom: 4px;">
+                                    ${artifact.name}
+                                </div>
+                                <div style="font-size: 12px; line-height: 1.4; color: rgba(45,45,45,0.8);">
+                                    ${artifact.description}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+
+            <!-- Key Information Cards -->
             ${site.significance ? `
                 <div class="info-card" style="background: rgba(212, 175, 55, 0.15);">
                     <div class="info-icon">⭐</div>
@@ -493,14 +622,6 @@ function showSiteInfo(site) {
                 </div>
             </div>
 
-            <div class="info-card">
-                <div class="info-icon">📍</div>
-                <div class="info-details">
-                    <div class="info-label">Coordinates</div>
-                    <div class="info-value">${site.lat.toFixed(4)}°, ${site.lng.toFixed(4)}°</div>
-                </div>
-            </div>
-
             ${site.visitors ? `
                 <div class="info-card" style="background: rgba(16, 185, 129, 0.1);">
                     <div class="info-icon">👥</div>
@@ -520,11 +641,205 @@ function showSiteInfo(site) {
                     </div>
                 </div>
             ` : ''}
+
+            <!-- Contemporary Sites -->
+            ${contemporarySites.length > 0 ? `
+                <div style="
+                    background: rgba(139, 105, 20, 0.1);
+                    padding: 12px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                    border: 2px dashed #8b6914;
+                    margin-bottom: 8px;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #8b6914;
+                        margin-bottom: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🕰️ Contemporary Sites
+                    </div>
+                    <div style="font-size: 12px; color: rgba(45,45,45,0.7); margin-bottom: 8px;">
+                        Other sites that existed around ${site.founded}:
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${contemporarySites.slice(0, 5).map(s => `
+                            <div onclick="window.dispatchEvent(new CustomEvent('showSite', { detail: '${s.name}' }))" style="
+                                padding: 6px 10px;
+                                background: white;
+                                border: 2px solid #8b6914;
+                                border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+                                font-size: 11px;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                            " onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='white'">
+                                ${s.icon} ${s.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Related Sites -->
+            ${site.relatedSites && site.relatedSites.length > 0 ? `
+                <div style="
+                    background: rgba(184, 115, 51, 0.1);
+                    padding: 12px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                    border: 2px dashed #b87333;
+                    margin-bottom: 8px;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #8b6914;
+                        margin-bottom: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🔗 Related Sites
+                    </div>
+                    <div style="font-size: 12px; color: rgba(45,45,45,0.7); margin-bottom: 8px;">
+                        If you're interested in ${site.name}, also explore:
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${site.relatedSites.map(relatedName => {
+                            const related = ancientSites.find(s => s.name === relatedName);
+                            return related ? `
+                                <div onclick="window.dispatchEvent(new CustomEvent('showSite', { detail: '${related.name}' }))" style="
+                                    padding: 6px 10px;
+                                    background: white;
+                                    border: 2px solid #b87333;
+                                    border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+                                    font-size: 11px;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                " onmouseover="this.style.background='rgba(184,115,51,0.2)'" onmouseout="this.style.background='white'">
+                                    ${related.icon} ${related.name}
+                                </div>
+                            ` : '';
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- External Links -->
+            ${site.externalLinks ? `
+                <div style="
+                    background: rgba(59, 130, 246, 0.05);
+                    padding: 12px;
+                    border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+                    border: 2px solid #3b82f6;
+                    margin-bottom: 8px;
+                ">
+                    <div style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #8b6914;
+                        margin-bottom: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        🌐 Learn More
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        ${site.externalLinks.wikipedia ? `
+                            <a href="${site.externalLinks.wikipedia}" target="_blank" rel="noopener" style="
+                                padding: 8px 12px;
+                                background: white;
+                                border: 2px solid #3b82f6;
+                                border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+                                font-size: 12px;
+                                color: #2d2d2d;
+                                text-decoration: none;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: all 0.2s ease;
+                            " onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background='white'">
+                                📖 Wikipedia Article
+                            </a>
+                        ` : ''}
+                        ${site.externalLinks.virtualTour ? `
+                            <a href="${site.externalLinks.virtualTour}" target="_blank" rel="noopener" style="
+                                padding: 8px 12px;
+                                background: white;
+                                border: 2px solid #3b82f6;
+                                border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+                                font-size: 12px;
+                                color: #2d2d2d;
+                                text-decoration: none;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: all 0.2s ease;
+                            " onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background='white'">
+                                🎨 Virtual Tour
+                            </a>
+                        ` : ''}
+                        ${site.externalLinks.video ? `
+                            <a href="${site.externalLinks.video}" target="_blank" rel="noopener" style="
+                                padding: 8px 12px;
+                                background: white;
+                                border: 2px solid #3b82f6;
+                                border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+                                font-size: 12px;
+                                color: #2d2d2d;
+                                text-decoration: none;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: all 0.2s ease;
+                            " onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background='white'">
+                                🎥 Video Documentaries
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            ` : ''}
         </div>
     `;
 
     panel.classList.remove('hidden');
 }
+
+// Get sites that existed around the same time
+function getContemporarySites(site) {
+    const siteYear = parseFoundedYear(site.founded);
+    if (!siteYear) return [];
+
+    return ancientSites.filter(s => {
+        if (s.name === site.name) return false;
+        const otherYear = parseFoundedYear(s.founded);
+        if (!otherYear) return false;
+
+        // Within 500 years
+        return Math.abs(siteYear - otherYear) <= 500;
+    }).slice(0, 5);
+}
+
+// Handle custom show site event from related/contemporary sites
+window.addEventListener('showSite', (e) => {
+    const siteName = e.detail;
+    const site = ancientSites.find(s => s.name === siteName);
+    if (site) {
+        showSiteInfo(site);
+        selectedSite = site.name;
+        globe.pointOfView({
+            lat: site.lat,
+            lng: site.lng,
+            altitude: 1.5
+        }, 1000);
+    }
+});
 
 // Get period display name
 function getPeriodName(period) {
@@ -536,19 +851,71 @@ function getPeriodName(period) {
     return periods[period] || period;
 }
 
+// Parse founded date string to numeric year (negative for BCE)
+function parseFoundedYear(founded) {
+    if (!founded) return null;
+
+    // Remove ~ and whitespace
+    const cleaned = founded.replace(/~/g, '').trim();
+
+    // Extract number
+    const match = cleaned.match(/(\d+)/);
+    if (!match) return null;
+
+    const year = parseInt(match[1]);
+
+    // Return negative for BCE, positive for CE
+    if (cleaned.includes('BCE')) {
+        return -year;
+    } else {
+        return year;
+    }
+}
+
+// Format year for display
+function formatYear(year) {
+    if (year === 1500) return 'All Time';
+    if (year < 0) {
+        return `${Math.abs(year)} BCE`;
+    } else if (year === 0) {
+        return '1 CE';
+    } else {
+        return `${year} CE`;
+    }
+}
+
+// Get all sites that apply to all active filters
+function getFilteredSites() {
+    let sites = ancientSites;
+
+    // Apply era filter
+    if (currentFilter !== 'all') {
+        sites = sites.filter(site => site.period === currentFilter);
+    }
+
+    // Apply timeline filter
+    if (currentTimelineYear < 1500) {
+        sites = sites.filter(site => {
+            const year = parseFoundedYear(site.founded);
+            return year !== null && year <= currentTimelineYear;
+        });
+    }
+
+    // Apply civilization filter
+    const civFilter = document.getElementById('civilizationFilter');
+    if (civFilter && civFilter.value !== 'all') {
+        sites = sites.filter(site => site.civilization === civFilter.value);
+    }
+
+    return sites;
+}
+
 // Filter sites by period
 function filterByPeriod(period) {
     currentFilter = period;
 
-    let sitesToShow;
-    if (period === 'all') {
-        sitesToShow = ancientSites;
-    } else {
-        sitesToShow = ancientSites.filter(site => site.period === period);
-    }
-
-    // Update markers with filtered data
-    updateSiteData(sitesToShow);
+    // Update markers with all active filters
+    updateSiteData(getFilteredSites());
 
     // Update legend active state
     document.querySelectorAll('.legend-item').forEach(item => {
@@ -609,22 +976,21 @@ function initControls() {
     populateCivilizationFilter();
 
     // Civilization filter
-    document.getElementById('civilizationFilter').addEventListener('change', (e) => {
-        const civilization = e.target.value;
-        if (civilization === 'all') {
-            // Show all sites (respecting current period filter)
-            filterByPeriod(currentFilter);
-        } else {
-            // Filter by civilization (also respect era filter if active)
-            let filtered = ancientSites.filter(site => site.civilization === civilization);
+    document.getElementById('civilizationFilter').addEventListener('change', () => {
+        // Update with all active filters
+        updateSiteData(getFilteredSites());
+    });
 
-            // If era filter is active, also apply it
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(site => site.period === currentFilter);
-            }
+    // Timeline slider
+    const timelineSlider = document.getElementById('timelineSlider');
+    const timelineValue = document.getElementById('timelineValue');
 
-            updateSiteData(filtered);
-        }
+    timelineSlider.addEventListener('input', (e) => {
+        currentTimelineYear = parseInt(e.target.value);
+        timelineValue.textContent = formatYear(currentTimelineYear);
+
+        // Update with all active filters
+        updateSiteData(getFilteredSites());
     });
 }
 

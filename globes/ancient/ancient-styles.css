@@ -90,6 +90,7 @@ header {
     transform: translateX(-50%);
     z-index: 100;
     pointer-events: none;
+    max-width: 90%;
 }
 
 header h1 {
@@ -98,13 +99,14 @@ header h1 {
     font-weight: 700;
     color: #2d2d2d;
     margin: 0;
-    background: linear-gradient(135deg, #f4e8d0 0%, #e8dcc0 100%);
+    background: linear-gradient(135deg, rgba(244, 232, 208, 0.95) 0%, rgba(232, 220, 192, 0.95) 100%);
     padding: 12px 32px;
     border: 3px solid #8b6914;
     border-radius: 200px 20px 200px 20px / 20px 200px 20px 200px;
-    box-shadow: 5px 5px 0px 0px #8b6914;
+    box-shadow: 5px 5px 0px 0px rgba(139, 105, 20, 0.8);
     transform: rotate(1deg);
     position: relative;
+    backdrop-filter: blur(8px);
 }
 
 header h1::before {
@@ -238,15 +240,17 @@ header h1::before {
     top: 50%;
     right: 30px;
     transform: translateY(-50%);
-    width: 380px;
+    width: 420px;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
     background: linear-gradient(135deg, #f4e8d0 0%, #e8dcc0 100%);
     border-radius: 200px 20px 200px 20px / 20px 200px 20px 200px;
     border: 3px solid #8b6914;
     z-index: 200;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow: 6px 6px 0px 0px #8b6914;
+    scroll-behavior: smooth;
 }
 
 .info-panel.hidden {
@@ -284,6 +288,7 @@ header h1::before {
     align-items: center;
     justify-content: center;
     box-shadow: 2px 2px 0px 0px #8b6914;
+    z-index: 1000;
 }
 
 .close-panel:hover {
@@ -490,24 +495,25 @@ footer {
 }
 
 /* Scrollbar Styling */
-.info-panel::-webkit-scrollbar {
+.info-panel::-webkit-scrollbar, .gallery-thumbnails::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
-.info-panel::-webkit-scrollbar-track {
+.info-panel::-webkit-scrollbar-track, .gallery-thumbnails::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.info-panel::-webkit-scrollbar-thumb {
+.info-panel::-webkit-scrollbar-thumb, .gallery-thumbnails::-webkit-scrollbar-thumb {
     background: rgba(139, 105, 20, 0.3);
     border-radius: 10px;
 }
 
-.info-panel::-webkit-scrollbar-thumb:hover {
+.info-panel::-webkit-scrollbar-thumb:hover, .gallery-thumbnails::-webkit-scrollbar-thumb:hover {
     background: rgba(139, 105, 20, 0.5);
 }
 
-.info-panel {
+.info-panel, .gallery-thumbnails {
     scrollbar-width: thin;
     scrollbar-color: rgba(139, 105, 20, 0.3) transparent;
 }
@@ -526,7 +532,7 @@ footer {
         transform: none;
         top: auto;
         bottom: 30px;
-        max-height: 60vh;
+        max-height: 70vh;
     }
 
     .info-panel.hidden {
@@ -600,4 +606,68 @@ footer {
     background: rgba(212, 175, 55, 0.3);
     border-color: #d4af37;
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+/* Timeline Slider */
+#timelineSlider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: linear-gradient(to right, #8b6914, #d4af37, #cd7f32);
+    border: 2px solid #8b6914;
+    border-radius: 15px 12px 16px 13px / 13px 16px 12px 15px;
+    outline: none;
+    cursor: pointer;
+}
+
+#timelineSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #d4af37;
+    border: 3px solid #8b6914;
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+#timelineSlider::-webkit-slider-thumb:hover {
+    background: #e6b800;
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+#timelineSlider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+#timelineSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #d4af37;
+    border: 3px solid #8b6914;
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+#timelineSlider::-moz-range-thumb:hover {
+    background: #e6b800;
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+#timelineSlider::-moz-range-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+#timelineValue {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #8b6914;
 }

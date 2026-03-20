@@ -15,6 +15,37 @@ const ancientSites = [
         discovery: "Always known to history. Serious archaeological study began in 1800s.",
         visitors: "14 million annually",
         image: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=600&q=80",
+        images: [
+            "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=800&q=80",
+            "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80",
+            "https://images.unsplash.com/photo-1539768942893-daf53e448371?w=800&q=80",
+            "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=800&q=80"
+        ],
+        didYouKnow: [
+            "Originally covered in smooth white limestone casing stones that reflected sunlight, making them shine like 'jewels'",
+            "The Great Pyramid was the tallest man-made structure for 3,800 years until Lincoln Cathedral in 1311 CE",
+            "Built with approximately 2.3 million stone blocks, each weighing 2.5 to 15 tons",
+            "Internal temperature stays constant at 20°C (68°F) regardless of outside weather",
+            "The four sides face almost exactly north, south, east and west with incredible precision"
+        ],
+        artifacts: [
+            {
+                name: "Solar Boat of Khufu",
+                description: "Intact full-size ship buried at the pyramid's base, possibly for pharaoh's journey in afterlife",
+                image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80"
+            },
+            {
+                name: "Pyramid Capstone",
+                description: "Golden pyramidion that once crowned the apex, now lost to history",
+                image: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=400&q=80"
+            }
+        ],
+        relatedSites: ["Luxor (Ancient Thebes)", "Abu Simbel", "Saqqara (Step Pyramid)"],
+        externalLinks: {
+            wikipedia: "https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza",
+            virtualTour: "https://artsandculture.google.com/asset/the-great-pyramids-of-giza/",
+            video: "https://www.youtube.com/results?search_query=giza+pyramids+documentary"
+        },
         markerImage: "https://api.iconify.design/mdi/pyramid.svg?color=%23d4af37&width=32",
         icon: "🔺",
         unesco: true
@@ -232,6 +263,36 @@ const ancientSites = [
         discovery: "Rediscovered by Hiram Bingham in 1911, though locals always knew of it.",
         visitors: "1.5 million annually (limited permits)",
         image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=600&q=80",
+        images: [
+            "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+            "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+            "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80"
+        ],
+        didYouKnow: [
+            "Built without using wheels, iron tools, or draft animals - only bronze tools and stone hammers",
+            "Sits on two fault lines but has never been destroyed by earthquake due to precise stonework that 'dances' with tremors",
+            "Contains over 150 buildings ranging from baths and houses to temples and sanctuaries",
+            "Only 400 people lived there at its peak - it was likely a royal estate, not a city",
+            "Never found by Spanish conquistadors - remained hidden for 400 years"
+        ],
+        artifacts: [
+            {
+                name: "Intihuatana Stone",
+                description: "'Hitching post of the Sun' - astronomic clock/calendar carved from granite",
+                image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&q=80"
+            },
+            {
+                name: "Temple of the Three Windows",
+                description: "Ceremonial temple with three trapezoidal windows overlooking the plaza",
+                image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&q=80"
+            }
+        ],
+        relatedSites: ["Cusco", "Chichen Itza", "Angkor Wat"],
+        externalLinks: {
+            wikipedia: "https://en.wikipedia.org/wiki/Machu_Picchu",
+            virtualTour: "https://artsandculture.google.com/story/machu-picchu",
+            video: "https://www.youtube.com/results?search_query=machu+picchu+documentary"
+        },
         markerImage: "https://api.iconify.design/game-icons/stone-tower.svg?color=%23d4af37&width=32",
         icon: "⛰️",
         unesco: true
